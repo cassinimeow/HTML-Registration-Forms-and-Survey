@@ -27,14 +27,16 @@ function renderMarketRow(row) {
 
 function renderDisasterRow(row) {
     var tbody = document.getElementById('disaster-table-body');
-    clearPlaceholderRow(tbody, 7);
+    clearPlaceholderRow(tbody, 12);
     var tr = document.createElement('tr');
     if (row.kit === 'No') tr.classList.add('non-compliant');
     tr.innerHTML =
         '<td>' + row.familyName + '</td><td>' + row.address + '</td>' +
         '<td>' + row.members + '</td><td>' + row.risk + '</td>' +
-        '<td>' + row.kit + '</td><td>' + row.eplan + '</td>' +
-        '<td>' + row.experience + '</td>';
+        '<td>' + row.pastDisaster + '</td><td>' + row.experience + '</td>' +
+        '<td>' + row.evacPoint + '</td><td>' + row.evacPlan + '</td>' +
+        '<td>' + row.planDetails + '</td><td>' + row.kit + '</td>' +
+        '<td>' + row.kitItems + '</td><td>' + row.kitNeed + '</td>';
     tbody.appendChild(tr);
 }
 
@@ -64,7 +66,7 @@ async function loadMarketRecords() {
 async function loadDisasterRecords() {
     var result = await supabaseClient
         .from('disaster_submissions')
-        .select('family_name,address,members,risk,kit,eplan,experience,created_at')
+        .select('family_name,address,members,risk,dexp,experience,epoint,eplan_answer,plan_items,kit,kit_items,kit_need,created_at')
         .order('created_at', { ascending: true });
     if (result.error) {
         console.warn('Failed to load disaster records:', result.error.message);
@@ -76,9 +78,14 @@ async function loadDisasterRecords() {
             address: item.address || '—',
             members: item.members || '—',
             risk: item.risk || '—',
+            pastDisaster: item.dexp || '—',
+            experience: item.experience || 'N/A',
+            evacPoint: item.epoint || '—',
+            evacPlan: item.eplan_answer || '—',
+            planDetails: item.plan_items || '—',
             kit: item.kit || '—',
-            eplan: item.eplan || '—',
-            experience: item.experience || 'N/A'
+            kitItems: item.kit_items || '—',
+            kitNeed: item.kit_need || '—'
         });
     });
 }
@@ -166,16 +173,27 @@ document.querySelectorAll('input[name="kit_ready"]').forEach(function(radio) {
 /* --- Disaster form: submit to table --- */
 document.getElementById('disaster-form').addEventListener('submit', async function(e) {
     e.preventDefault();
+    var pastDisaster = document.querySelector('input[name="dexp"]:checked');
+    var evacPoint = document.querySelector('input[name="epoint"]:checked');
+    var evacPlan = document.querySelector('input[name="eplan"]:checked');
     var kitReady = document.querySelector('input[name="kit_ready"]:checked');
+    var kitNeed = document.querySelector('input[name="kit_need"]:checked');
     var plans = [];
     document.querySelectorAll('input[name="plan"]:checked').forEach(function(cb) { plans.push(cb.value); });
+    var kitItems = [];
+    document.querySelectorAll('input[name="kit_items"]:checked').forEach(function(cb) { kitItems.push(cb.value); });
     var row = {
         familyName: document.getElementById('family-name').value || '—',
         address:    document.getElementById('d-address').value || '—',
         members:    document.getElementById('family-members').value || '—',
         risk:       document.getElementById('risk').value,
+        pastDisaster: pastDisaster ? pastDisaster.value : '—',
         kit:        kitReady ? kitReady.value : '—',
-        eplan:      plans.length > 0 ? plans.join(', ') : '—',
+        evacPoint:  evacPoint ? evacPoint.value : '—',
+        evacPlan:   evacPlan ? evacPlan.value : '—',
+        planDetails: plans.length > 0 ? plans.join(', ') : '—',
+        kitItems:   kitItems.length > 0 ? kitItems.join(', ') : '—',
+        kitNeed:    kitNeed ? kitNeed.value : '—',
         experience: document.getElementById('description').value || 'N/A'
     };
     var result = await supabaseClient
@@ -185,9 +203,14 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
             address: row.address,
             members: row.members === '—' ? null : row.members,
             risk: row.risk,
+            dexp: row.pastDisaster,
+            experience: row.experience,
+            epoint: row.evacPoint,
+            eplan_answer: row.evacPlan,
+            plan_items: row.planDetails,
             kit: row.kit,
-            eplan: row.eplan,
-            experience: row.experience
+            kit_items: row.kitItems,
+            kit_need: row.kitNeed
         }])
         .select()
         .single();
