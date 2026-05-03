@@ -161,8 +161,16 @@
 
         <!-- AGUILA: Map placeholder -->
         <div id="map-placeholder">
-            🗺️ <strong>Map Integration (GIS Placeholder)</strong><br>
-            A barangay map showing flood-prone areas will be displayed here.
+            <iframe
+                title="HazardHunterPH map view"
+                src="https://hazardhunter.georisk.gov.ph/map"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            <div class="map-caption">
+                Data source: HazardHunterPH (PHIVOLCS). If the map does not load, open the
+                <a href="https://hazardhunter.georisk.gov.ph/map" target="_blank" rel="noopener">map view</a>.
+            </div>
         </div>
 
         <form id="disaster-form">
@@ -262,10 +270,10 @@
 
                 </fieldset>
 
+                <button type="submit">Submit Survey</button>
+
             </div>
             <!-- MAYO SECTION END -->
-
-            <button type="submit">Submit Survey</button>
 
         </form>
 
