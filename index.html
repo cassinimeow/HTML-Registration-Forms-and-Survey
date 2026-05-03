@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Survey System</title>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!--                        NAVBAR                               -->
+    <!-- ============================================================ -->
+    <nav>
+        <span>Community Survey System</span>
+        <div>
+            <button onclick="showPage('market')">Market Vendor Registration</button>
+            <button onclick="showPage('disaster')">Disaster Preparedness Survey</button>
+        </div>
+    </nav>
+
+    <!-- ============================================================ -->
+    <!--            PAGE 1: PUBLIC MARKET VENDOR REGISTRATION        -->
+    <!-- ============================================================ -->
+    <div id="market-page">
+
+        <h1>Public Market Vendor Registration Form</h1>
+
+        <form action="#" method="post">
+
+            <!-- ABELARDE SECTION START -->
+            <div id="abelarde-section">
+
+                <fieldset>
+                    <legend>Personal Information</legend>
+
+                    <label for="fullname">Full Name:</label>
+                    <input type="text" id="fullname" name="fullname"><br><br>
+
+                    <label for="address">Home Address:</label>
+                    <input type="text" id="address" name="address"><br><br>
+
+                    <label for="contact">Contact Number:</label>
+                    <input type="text" id="contact" name="contact"><br><br>
+
+                    <label for="stall">Stall Number / Location:</label>
+                    <input type="text" id="stall" name="stall"><br><br>
+
+                    <label for="businessName">Business Name:</label>
+                    <input type="text" id="businessName" name="businessName"><br><br>
+
+                    <label for="goods">Type of Goods Sold:</label>
+                    <input type="text" id="goods" name="goods"><br><br>
+
+                    <label for="permit">Business Permit Number:</label>
+                    <input type="text" id="permit" name="permit"><br><br>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Identification</legend>
+
+                    <label for="idType">Valid ID Type:</label>
+                    <input type="text" id="idType" name="idType"><br><br>
+
+                    <label for="idNumber">ID Number:</label>
+                    <input type="text" id="idNumber" name="idNumber"><br><br>
+                </fieldset>
+
+            </div>
+            <!-- ABELARDE SECTION END -->
+
+            <!-- JUAMPIT SECTION START -->
+            <div id="juampit-section">
+
+                <fieldset>
+                    <legend>Compliance Check</legend>
+
+                    <p>Sanitary Practices:</p>
+                    <input type="radio" id="good" name="sanitary" value="Good">
+                    <label for="good">Good</label><br>
+                    <input type="radio" id="fair" name="sanitary" value="Fair">
+                    <label for="fair">Fair</label><br>
+                    <input type="radio" id="poor" name="sanitary" value="Poor">
+                    <label for="poor">Poor</label><br><br>
+
+                    <p>Stall Cleanliness:</p>
+                    <input type="checkbox" id="daily" name="cleanliness[]" value="Daily Cleaning">
+                    <label for="daily">Daily Cleaning</label><br>
+                    <input type="checkbox" id="waste" name="cleanliness[]" value="Waste Disposal">
+                    <label for="waste">Waste Disposal</label><br><br>
+
+                    <p>Waste Segregation Compliance:</p>
+                    <input type="radio" id="wsyes" name="wasteSegregation" value="Yes">
+                    <label for="wsyes">Yes</label><br>
+                    <input type="radio" id="wsno" name="wasteSegregation" value="No">
+                    <label for="wsno">No</label><br><br>
+
+                    <p>Health Certificate Status:</p>
+                    <label for="healthStatus">Select Status:</label>
+                    <select id="healthStatus" name="healthStatus">
+                        <option value="Valid">Valid</option>
+                        <option value="Expired">Expired</option>
+                        <option value="Not Yet Obtained">Not Yet Obtained</option>
+                    </select><br><br>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Agreement</legend>
+                    <input type="checkbox" id="agree" name="agree">
+                    <label for="agree">I hereby certify that the information provided is true and correct.</label>
+                </fieldset>
+
+                <br>
+                <button type="submit">Register</button>
+
+            </div>
+            <!-- JUAMPIT SECTION END -->
+
+        </form>
+
+        <!-- TABLE SECTION -->
+        <h2>Vendor Registration Records</h2>
+        <table border="1" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Business Name</th>
+                    <th>Stall No.</th>
+                    <th>Goods Sold</th>
+                    <th>Permit No.</th>
+                    <th>Sanitary Practice</th>
+                    <th>Waste Segregation</th>
+                    <th>Health Certificate</th>
+                </tr>
+            </thead>
+            <tbody id="market-table-body">
+                <tr>
+                    <td colspan="8" style="text-align:center;">No records yet.</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <!-- END PAGE 1 -->
+
+
+    <!-- ============================================================ -->
+    <!--            PAGE 2: DISASTER PREPAREDNESS SURVEY             -->
+    <!-- ============================================================ -->
+    <div id="disaster-page" style="display:none;">
+
+        <h1>Disaster Preparedness Survey</h1>
+
+        <form id="disaster-form">
+
+            <!-- DINAYA SECTION START -->
+            <div id="dinaya-section">
+
+                <fieldset>
+                    <legend>Household Information</legend>
+
+                    <label for="family-name">Family Name:</label><br>
+                    <input type="text" id="family-name" name="family_name" placeholder="Enter family name"><br><br>
+
+                    <label for="d-address">Address:</label><br>
+                    <input type="text" id="d-address" name="address" placeholder="Enter your address"><br><br>
+
+                    <label for="family-members">Number of Family Members:</label><br>
+                    <input type="number" id="family-members" name="family_members" min="1" placeholder="Enter number"><br><br>
+                </fieldset>
+
+            </div>
+            <!-- DINAYA SECTION END -->
+
+            <!-- MAYO SECTION START -->
+            <div id="mayo-section">
+
+                <fieldset>
+                    <legend>Preparedness Check</legend>
+
+                    <label>1. How would you describe the level of flood/typhoon risk in your area?</label><br>
+                    <select name="risk" id="risk">
+                        <option value="High">High</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="Low">Low</option>
+                    </select><br><br>
+
+                    <p>2. Has your household experienced any disasters in the past?</p>
+                    <input type="radio" name="dexp" id="dyes" value="Yes">
+                    <label for="dyes">Yes</label><br>
+                    <input type="radio" name="dexp" id="dno" value="No">
+                    <label for="dno">No</label><br><br>
+
+                    <label for="description">3. If yes, briefly describe your past disaster experience. If none, write "N/A."</label><br>
+                    <textarea name="description" id="description" rows="4" cols="50"></textarea><br><br>
+
+                    <p>4. Does your household know where to go for evacuation during a flood or typhoon?</p>
+                    <input type="radio" name="epoint" id="epyes" value="Yes">
+                    <label for="epyes">Yes</label><br>
+                    <input type="radio" name="epoint" id="epno" value="No">
+                    <label for="epno">No</label><br><br>
+
+                    <p>5. Does your household have an evacuation plan?</p>
+                    <input type="radio" name="eplan" id="eyes" value="Yes">
+                    <label for="eyes">Yes</label><br>
+                    <input type="radio" name="eplan" id="eno" value="No">
+                    <label for="eno">No</label><br><br>
+
+                    <p>6. If yes, which of the following evacuation plans does your household have? (Select all that apply)</p>
+                    <input type="checkbox" id="plan1" name="plan" value="Family meeting point">
+                    <label for="plan1">Family meeting point</label><br>
+                    <input type="checkbox" id="plan2" name="plan" value="Assigned evacuation center">
+                    <label for="plan2">Assigned evacuation center</label><br>
+                    <input type="checkbox" id="plan3" name="plan" value="Identified evacuation route">
+                    <label for="plan3">Identified Evacuation Route</label><br>
+                    <input type="checkbox" id="plan4" name="plan" value="Emergency contact list">
+                    <label for="plan4">Emergency contact list</label><br><br>
+
+                    <p>7. Does your household have a disaster-ready emergency kit?</p>
+                    <input type="radio" name="kit_ready" id="kyes" value="Yes">
+                    <label for="kyes">Yes</label><br>
+                    <input type="radio" name="kit_ready" id="kno" value="No">
+                    <label for="kno">No</label><br><br>
+
+                    <p>8. If yes, what items are included in your emergency kit? (Select all that apply)</p>
+                    <input type="checkbox" id="kit1" name="kit_items" value="Drinking water">
+                    <label for="kit1">Drinking water</label><br>
+                    <input type="checkbox" id="kit2" name="kit_items" value="Food supplies">
+                    <label for="kit2">Food supplies</label><br>
+                    <input type="checkbox" id="kit3" name="kit_items" value="First aid kit">
+                    <label for="kit3">First aid kit</label><br>
+                    <input type="checkbox" id="kit4" name="kit_items" value="Flashlight">
+                    <label for="kit4">Flashlight</label><br>
+                    <input type="checkbox" id="kit5" name="kit_items" value="Battery / Power bank">
+                    <label for="kit5">Battery / Power bank</label><br>
+                    <input type="checkbox" id="kit6" name="kit_items" value="Medicine">
+                    <label for="kit6">Medicine</label><br>
+                    <input type="checkbox" id="kit7" name="kit_items" value="Whistle">
+                    <label for="kit7">Whistle</label><br>
+                    <input type="checkbox" id="kit8" name="kit_items" value="Important documents">
+                    <label for="kit8">Important documents</label><br><br>
+
+                    <p>9. Does your household currently need an emergency kit?</p>
+                    <input type="radio" name="kit_need" id="ekityes" value="Yes">
+                    <label for="ekityes">Yes</label><br>
+                    <input type="radio" name="kit_need" id="ekitno" value="No">
+                    <label for="ekitno">No</label><br><br>
+
+                </fieldset>
+
+            </div>
+            <!-- MAYO SECTION END -->
+
+            <button type="submit">Submit Survey</button>
+
+        </form>
+
+        <!-- TABLE SECTION -->
+        <h2>Disaster Preparedness Survey Records</h2>
+        <table border="1" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Family Name</th>
+                    <th>Address</th>
+                    <th>Family Members</th>
+                    <th>Risk Level</th>
+                    <th>Emergency Kit</th>
+                    <th>Evacuation Plan</th>
+                    <th>Past Disaster Experience</th>
+                </tr>
+            </thead>
+            <tbody id="disaster-table-body">
+                <tr>
+                    <td colspan="7" style="text-align:center;">No records yet.</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <!-- END PAGE 2 -->
+
+
+    <!-- ============================================================ -->
+    <!--                     AGUILA: NAVBAR JS                       -->
+    <!-- ============================================================ -->
+    <script>
+        function showPage(page) {
+            document.getElementById('market-page').style.display = 'none';
+            document.getElementById('disaster-page').style.display = 'none';
+            document.getElementById(page + '-page').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
