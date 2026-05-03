@@ -1,0 +1,281 @@
+/* ============================================================ */
+/*                     AGUILA: CSS STYLES                      */
+/* ============================================================ */
+
+/* === GLOBAL RESET & BASE === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    color: #222;
+    min-height: 100vh;
+}
+
+/* === BACKGROUND WRAPPER === */
+.bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px) brightness(0.55);
+    z-index: -1;
+}
+
+#bg-market {
+    background-image: url('https://c.pxhere.com/photos/65/a8/produce_market_batac_city_philippines_producemarketbataccityphilippines_foodmarket_lumixfz200-341374.jpg!d');
+}
+
+#bg-disaster {
+    background-image: url('https://static01.nyt.com/images/2022/12/29/multimedia/22insider-indonesia-quake-1-5dbe/22insider-indonesia-quake-1-5dbe-videoSixteenByNine3000.jpg');
+    display: none;
+}
+
+/* === NAVBAR === */
+nav {
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav span {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+nav div {
+    display: flex;
+    gap: 12px;
+}
+
+nav button {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+nav button:hover,
+nav button.active {
+    background-color: white;
+    color: #222;
+}
+
+/* === PAGE CONTAINER === */
+.page {
+    max-width: 720px;
+    margin: 36px auto;
+    padding: 0 16px 60px;
+}
+
+.page h1 {
+    color: white;
+    font-size: 26px;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+}
+
+.page h2 {
+    color: white;
+    font-size: 20px;
+    margin: 32px 0 12px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+}
+
+/* === SECTION CARDS === */
+#abelarde-section,
+#juampit-section,
+#dinaya-section,
+#mayo-section {
+    background-color: rgba(255, 255, 255, 0.92);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: background-color 0.3s, border 0.3s;
+}
+
+/* === FIELDSET === */
+fieldset {
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+}
+
+legend {
+    font-weight: bold;
+    font-size: 15px;
+    padding: 0 8px;
+    color: #333;
+}
+
+/* === LABELS === */
+label {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* === INPUTS === */
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #bbb;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    background-color: #fff;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #4a90d9;
+    outline: none;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    margin-right: 6px;
+    accent-color: #4a90d9;
+}
+
+input[type="radio"] + label,
+input[type="checkbox"] + label {
+    font-weight: normal;
+    margin-bottom: 6px;
+}
+
+p {
+    font-weight: 600;
+    margin: 10px 0 6px;
+    color: #333;
+}
+
+/* === WARNING HIGHLIGHT === */
+.warning-highlight {
+    background-color: #ffe5e5 !important;
+    border: 1.5px solid #e53935 !important;
+}
+
+/* === BUTTONS === */
+button[type="submit"] {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: block;
+    margin: 8px 0 0 auto;
+}
+
+button[type="submit"]:hover {
+    background-color: #1b5e20;
+}
+
+#export-btn {
+    background-color: #1565c0;
+    color: white;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.2s;
+}
+
+#export-btn:hover { background-color: #0d47a1; }
+
+#print-btn {
+    background-color: #6a1b9a;
+    color: white;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-left: 8px;
+    transition: background-color 0.2s;
+}
+
+#print-btn:hover { background-color: #4a148c; }
+
+/* === TABLE === */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(255,255,255,0.95);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+thead tr {
+    background-color: #37474f;
+    color: white;
+}
+
+th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr:hover { background-color: #f0f4ff; }
+
+.non-compliant { background-color: #ffe5e5; }
+
+/* === MAP PLACEHOLDER === */
+#map-placeholder {
+    background-color: rgba(255,255,255,0.85);
+    border: 2px dashed #999;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: #666;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+/* === PRINT STYLES === */
+@media print {
+    nav, #export-btn, #print-btn, button[type="submit"] { display: none; }
+    .bg { display: none; }
+    .page { margin: 0; padding: 0; max-width: 100%; }
+    #abelarde-section, #juampit-section,
+    #dinaya-section, #mayo-section {
+        background: white;
+        box-shadow: none;
+    }
+    .page h1, .page h2 { color: black; text-shadow: none; }
+}
