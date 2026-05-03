@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebDev Assessment #1</title>
+    <link rel="icon" href="itech-logo.png">
 
     <!-- AGUILA: External CSS -->
     <link rel="stylesheet" href="style.css">
@@ -18,7 +19,9 @@
     <!--                        NAVBAR                               -->
     <!-- ============================================================ -->
     <nav>
-        <span>🧑‍💻 Web Development Assessment #1</span>
+        <span>
+            <img src="itech-logo.png" alt="Institute of Technology logo" width="36" height="36" style="vertical-align:middle; margin-right:10px;">Web Development Assessment #1
+        </span>
         <div>
             <button id="btn-market" class="active" onclick="showPage('market')">🛒 Market Vendor Registration</button>
             <button id="btn-disaster" onclick="showPage('disaster')">🌧️ Disaster Preparedness Survey</button>
@@ -269,27 +272,29 @@
         <!-- TABLE SECTION -->
         <h2>Disaster Preparedness Survey Records</h2>
         <button id="print-btn" onclick="window.print()">🖨️ Print Report</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Family Name</th>
-                    <th>Address</th>
-                    <th>Members</th>
-                    <th>Risk Level</th>
-                    <th>Past Disaster?</th>
-                    <th>Past Experience</th>
-                    <th>Evacuation Point</th>
-                    <th>Evacuation Plan?</th>
-                    <th>Plan Details</th>
-                    <th>Emergency Kit?</th>
-                    <th>Kit Items</th>
-                    <th>Needs Kit?</th>
-                </tr>
-            </thead>
-            <tbody id="disaster-table-body">
-                <tr><td colspan="12" style="text-align:center; color:#888;">No records yet.</td></tr>
-            </tbody>
-        </table>
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Family Name</th>
+                        <th>Address</th>
+                        <th>Members</th>
+                        <th>Risk Level</th>
+                        <th>Past Disaster?</th>
+                        <th>Past Experience</th>
+                        <th>Evacuation Point</th>
+                        <th>Evacuation Plan?</th>
+                        <th>Plan Details</th>
+                        <th>Emergency Kit?</th>
+                        <th>Kit Items</th>
+                        <th>Needs Kit?</th>
+                    </tr>
+                </thead>
+                <tbody id="disaster-table-body">
+                    <tr><td colspan="12" style="text-align:center; color:#888;">No records yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
 
     </div>
     <!-- END PAGE 2 -->

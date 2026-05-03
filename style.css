@@ -230,6 +230,17 @@ button[type="submit"]:hover {
 #print-btn:hover { background-color: #4a148c; }
 
 /* === TABLE === */
+.table-scroll {
+    overflow-x: auto;
+    padding-bottom: 6px;
+}
+
+.table-scroll table {
+    width: max-content;
+    min-width: 100%;
+    margin: 0 auto;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
