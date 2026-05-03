@@ -2,6 +2,92 @@
 /*                     AGUILA: JAVASCRIPT                      */
 /* ============================================================ */
 
+const SUPABASE_URL = 'https://mklthizjwvvnatndcree.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_H0g0m-DD15fbVFJ5TMPb4g_9U7IKEyu';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function clearPlaceholderRow(tbody, colSpan) {
+    if (tbody.rows[0] && tbody.rows[0].cells[0].colSpan === colSpan) {
+        tbody.innerHTML = '';
+    }
+}
+
+function renderMarketRow(row) {
+    var tbody = document.getElementById('market-table-body');
+    clearPlaceholderRow(tbody, 8);
+    var tr = document.createElement('tr');
+    if (row.sanitary === 'Poor' || row.wasteSeg === 'No') tr.classList.add('non-compliant');
+    tr.innerHTML =
+        '<td>' + row.fullname + '</td><td>' + row.businessName + '</td>' +
+        '<td>' + row.stall + '</td><td>' + row.goods + '</td>' +
+        '<td>' + row.permit + '</td><td>' + row.sanitary + '</td>' +
+        '<td>' + row.wasteSeg + '</td><td>' + row.healthCert + '</td>';
+    tbody.appendChild(tr);
+}
+
+function renderDisasterRow(row) {
+    var tbody = document.getElementById('disaster-table-body');
+    clearPlaceholderRow(tbody, 7);
+    var tr = document.createElement('tr');
+    if (row.kit === 'No') tr.classList.add('non-compliant');
+    tr.innerHTML =
+        '<td>' + row.familyName + '</td><td>' + row.address + '</td>' +
+        '<td>' + row.members + '</td><td>' + row.risk + '</td>' +
+        '<td>' + row.kit + '</td><td>' + row.eplan + '</td>' +
+        '<td>' + row.experience + '</td>';
+    tbody.appendChild(tr);
+}
+
+async function loadMarketRecords() {
+    var result = await supabaseClient
+        .from('market_submissions')
+        .select('fullname,business_name,stall,goods,permit,sanitary,waste_seg,health_cert,created_at')
+        .order('created_at', { ascending: true });
+    if (result.error) {
+        console.warn('Failed to load market records:', result.error.message);
+        return;
+    }
+    result.data.forEach(function(item) {
+        renderMarketRow({
+            fullname: item.fullname || '—',
+            businessName: item.business_name || '—',
+            stall: item.stall || '—',
+            goods: item.goods || '—',
+            permit: item.permit || '—',
+            sanitary: item.sanitary || '—',
+            wasteSeg: item.waste_seg || '—',
+            healthCert: item.health_cert || '—'
+        });
+    });
+}
+
+async function loadDisasterRecords() {
+    var result = await supabaseClient
+        .from('disaster_submissions')
+        .select('family_name,address,members,risk,kit,eplan,experience,created_at')
+        .order('created_at', { ascending: true });
+    if (result.error) {
+        console.warn('Failed to load disaster records:', result.error.message);
+        return;
+    }
+    result.data.forEach(function(item) {
+        renderDisasterRow({
+            familyName: item.family_name || '—',
+            address: item.address || '—',
+            members: item.members || '—',
+            risk: item.risk || '—',
+            kit: item.kit || '—',
+            eplan: item.eplan || '—',
+            experience: item.experience || 'N/A'
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadMarketRecords();
+    loadDisasterRecords();
+});
+
 /* --- Switch pages via navbar --- */
 function showPage(page) {
     document.getElementById('market-page').style.display = 'none';
@@ -25,7 +111,7 @@ document.querySelectorAll('input[name="sanitary"]').forEach(function(radio) {
 });
 
 /* --- Market form: submit to table --- */
-document.getElementById('market-form').addEventListener('submit', function(e) {
+document.getElementById('market-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     var sanitary = document.querySelector('input[name="sanitary"]:checked');
     var wasteSeg = document.querySelector('input[name="wasteSegregation"]:checked');
@@ -39,16 +125,26 @@ document.getElementById('market-form').addEventListener('submit', function(e) {
         wasteSeg:     wasteSeg ? wasteSeg.value : '—',
         healthCert:   document.getElementById('healthStatus').value
     };
-    var tbody = document.getElementById('market-table-body');
-    if (tbody.rows[0].cells[0].colSpan == 8) tbody.innerHTML = '';
-    var tr = document.createElement('tr');
-    if (row.sanitary === 'Poor' || row.wasteSeg === 'No') tr.classList.add('non-compliant');
-    tr.innerHTML =
-        '<td>' + row.fullname + '</td><td>' + row.businessName + '</td>' +
-        '<td>' + row.stall + '</td><td>' + row.goods + '</td>' +
-        '<td>' + row.permit + '</td><td>' + row.sanitary + '</td>' +
-        '<td>' + row.wasteSeg + '</td><td>' + row.healthCert + '</td>';
-    tbody.appendChild(tr);
+    var result = await supabaseClient
+        .from('market_submissions')
+        .insert([{ 
+            fullname: row.fullname,
+            business_name: row.businessName,
+            stall: row.stall,
+            goods: row.goods,
+            permit: row.permit,
+            sanitary: row.sanitary,
+            waste_seg: row.wasteSeg,
+            health_cert: row.healthCert
+        }])
+        .select()
+        .single();
+    if (result.error) {
+        console.error('Market submit failed:', result.error.message);
+        alert('Failed to save vendor record. Please try again.');
+        return;
+    }
+    renderMarketRow(row);
     this.reset();
     document.getElementById('compliance-fieldset').classList.remove('warning-highlight');
 });
@@ -68,7 +164,7 @@ document.querySelectorAll('input[name="kit_ready"]').forEach(function(radio) {
 });
 
 /* --- Disaster form: submit to table --- */
-document.getElementById('disaster-form').addEventListener('submit', function(e) {
+document.getElementById('disaster-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     var kitReady = document.querySelector('input[name="kit_ready"]:checked');
     var plans = [];
@@ -82,16 +178,25 @@ document.getElementById('disaster-form').addEventListener('submit', function(e) 
         eplan:      plans.length > 0 ? plans.join(', ') : '—',
         experience: document.getElementById('description').value || 'N/A'
     };
-    var tbody = document.getElementById('disaster-table-body');
-    if (tbody.rows[0].cells[0].colSpan == 7) tbody.innerHTML = '';
-    var tr = document.createElement('tr');
-    if (row.kit === 'No') tr.classList.add('non-compliant');
-    tr.innerHTML =
-        '<td>' + row.familyName + '</td><td>' + row.address + '</td>' +
-        '<td>' + row.members + '</td><td>' + row.risk + '</td>' +
-        '<td>' + row.kit + '</td><td>' + row.eplan + '</td>' +
-        '<td>' + row.experience + '</td>';
-    tbody.appendChild(tr);
+    var result = await supabaseClient
+        .from('disaster_submissions')
+        .insert([{ 
+            family_name: row.familyName,
+            address: row.address,
+            members: row.members === '—' ? null : row.members,
+            risk: row.risk,
+            kit: row.kit,
+            eplan: row.eplan,
+            experience: row.experience
+        }])
+        .select()
+        .single();
+    if (result.error) {
+        console.error('Disaster submit failed:', result.error.message);
+        alert('Failed to save survey record. Please try again.');
+        return;
+    }
+    renderDisasterRow(row);
     this.reset();
     document.getElementById('mayo-section').style.border = '';
     document.getElementById('mayo-section').style.backgroundColor = 'rgba(255,255,255,0.92)';
