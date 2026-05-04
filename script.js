@@ -14,14 +14,17 @@ function clearPlaceholderRow(tbody, colSpan) {
 
 function renderMarketRow(row) {
     var tbody = document.getElementById('market-table-body');
-    clearPlaceholderRow(tbody, 8);
+    clearPlaceholderRow(tbody, 13);
     var tr = document.createElement('tr');
     if (row.sanitary === 'Poor' || row.wasteSeg === 'No') tr.classList.add('non-compliant');
     tr.innerHTML =
-        '<td>' + row.fullname + '</td><td>' + row.businessName + '</td>' +
+        '<td>' + row.fullname + '</td><td>' + row.address + '</td>' +
+        '<td>' + row.contact + '</td><td>' + row.businessName + '</td>' +
         '<td>' + row.stall + '</td><td>' + row.goods + '</td>' +
-        '<td>' + row.permit + '</td><td>' + row.sanitary + '</td>' +
-        '<td>' + row.wasteSeg + '</td><td>' + row.healthCert + '</td>';
+        '<td>' + row.permit + '</td><td>' + row.idType + '</td>' +
+        '<td>' + row.idNumber + '</td><td>' + row.sanitary + '</td>' +
+        '<td>' + row.cleanliness + '</td><td>' + row.wasteSeg + '</td>' +
+        '<td>' + row.healthCert + '</td>';
     tbody.appendChild(tr);
 }
 
@@ -43,7 +46,7 @@ function renderDisasterRow(row) {
 async function loadMarketRecords() {
     var result = await supabaseClient
         .from('market_submissions')
-        .select('fullname,business_name,stall,goods,permit,sanitary,waste_seg,health_cert,created_at')
+        .select('fullname,address,contact,business_name,stall,goods,permit,id_type,id_number,cleanliness,sanitary,waste_seg,health_cert,created_at')
         .order('created_at', { ascending: true });
     if (result.error) {
         console.warn('Failed to load market records:', result.error.message);
@@ -52,11 +55,16 @@ async function loadMarketRecords() {
     result.data.forEach(function(item) {
         renderMarketRow({
             fullname: item.fullname || '—',
+            address: item.address || '—',
+            contact: item.contact || '—',
             businessName: item.business_name || '—',
             stall: item.stall || '—',
             goods: item.goods || '—',
             permit: item.permit || '—',
+            idType: item.id_type || '—',
+            idNumber: item.id_number || '—',
             sanitary: item.sanitary || '—',
+            cleanliness: item.cleanliness || '—',
             wasteSeg: item.waste_seg || '—',
             healthCert: item.health_cert || '—'
         });
@@ -122,13 +130,20 @@ document.getElementById('market-form').addEventListener('submit', async function
     e.preventDefault();
     var sanitary = document.querySelector('input[name="sanitary"]:checked');
     var wasteSeg = document.querySelector('input[name="wasteSegregation"]:checked');
+    var cleanlinessItems = [];
+    document.querySelectorAll('input[name="cleanliness[]"]:checked').forEach(function(cb) { cleanlinessItems.push(cb.value); });
     var row = {
         fullname:     document.getElementById('fullname').value || '—',
+        address:      document.getElementById('address').value || '—',
+        contact:      document.getElementById('contact').value || '—',
         businessName: document.getElementById('businessName').value || '—',
         stall:        document.getElementById('stall').value || '—',
         goods:        document.getElementById('goods').value || '—',
         permit:       document.getElementById('permit').value || '—',
+        idType:       document.getElementById('idType').value || '—',
+        idNumber:     document.getElementById('idNumber').value || '—',
         sanitary:     sanitary ? sanitary.value : '—',
+        cleanliness:  cleanlinessItems.length > 0 ? cleanlinessItems.join(', ') : '—',
         wasteSeg:     wasteSeg ? wasteSeg.value : '—',
         healthCert:   document.getElementById('healthStatus').value
     };
@@ -136,11 +151,16 @@ document.getElementById('market-form').addEventListener('submit', async function
         .from('market_submissions')
         .insert([{ 
             fullname: row.fullname,
+            address: row.address,
+            contact: row.contact,
             business_name: row.businessName,
             stall: row.stall,
             goods: row.goods,
             permit: row.permit,
+            id_type: row.idType,
+            id_number: row.idNumber,
             sanitary: row.sanitary,
+            cleanliness: row.cleanliness,
             waste_seg: row.wasteSeg,
             health_cert: row.healthCert
         }])
@@ -227,12 +247,12 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
 
 /* --- Export to CSV (simulated Excel export) --- */
 function exportToCSV() {
-    var headers = ['Full Name','Business Name','Stall No.','Goods Sold','Permit No.','Sanitary','Waste Seg.','Health Cert.'];
+    var headers = ['Full Name','Address','Contact','Business Name','Stall No.','Goods Sold','Permit No.','ID Type','ID Number','Sanitary','Cleanliness','Waste Seg.','Health Cert.'];
     var rows = [headers];
     var tbody = document.getElementById('market-table-body');
     for (var i = 0; i < tbody.rows.length; i++) {
         var cells = tbody.rows[i].cells;
-        if (cells[0].colSpan == 8) continue;
+        if (cells[0].colSpan == 13) continue;
         var row = [];
         for (var j = 0; j < cells.length; j++) row.push('"' + cells[j].innerText + '"');
         rows.push(row);

@@ -130,23 +130,30 @@
         <!-- TABLE SECTION -->
         <h2>Vendor Registration Records</h2>
         <button id="export-btn" onclick="exportToCSV()">⬇️ Export to Excel (CSV)</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Full Name</th>
-                    <th>Business Name</th>
-                    <th>Stall No.</th>
-                    <th>Goods Sold</th>
-                    <th>Permit No.</th>
-                    <th>Sanitary</th>
-                    <th>Waste Seg.</th>
-                    <th>Health Cert.</th>
-                </tr>
-            </thead>
-            <tbody id="market-table-body">
-                <tr><td colspan="8" style="text-align:center; color:#888;">No records yet.</td></tr>
-            </tbody>
-        </table>
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Address</th>
+                        <th>Contact</th>
+                        <th>Business Name</th>
+                        <th>Stall No.</th>
+                        <th>Goods Sold</th>
+                        <th>Permit No.</th>
+                        <th>ID Type</th>
+                        <th>ID Number</th>
+                        <th>Sanitary</th>
+                        <th>Cleanliness</th>
+                        <th>Waste Seg.</th>
+                        <th>Health Cert.</th>
+                    </tr>
+                </thead>
+                <tbody id="market-table-body">
+                    <tr><td colspan="13" style="text-align:center; color:#888;">No records yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
 
     </div>
     <!-- END PAGE 1 -->
