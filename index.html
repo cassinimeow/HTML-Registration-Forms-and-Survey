@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebDev Assessment #1</title>
-    <link rel="icon" href="itech-logo.png">
+    <link rel="icon" href="ph-coat-of-arms.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap">
 
     <!-- AGUILA: External CSS -->
     <link rel="stylesheet" href="style.css">
@@ -12,27 +13,38 @@
 <body>
 
     <!-- AGUILA: Blurred background images -->
+    <div class="bg" id="bg-landing"></div>
     <div class="bg" id="bg-market"></div>
     <div class="bg" id="bg-disaster"></div>
 
     <!-- ============================================================ -->
-    <!--                        NAVBAR                               -->
+    <!--                        HERO BANNER                         -->
     <!-- ============================================================ -->
-    <nav>
-        <span>
-            <img src="itech-logo.png" alt="Institute of Technology logo" width="36" height="36" style="vertical-align:middle; margin-right:10px;">Web Development Assessment #1
-        </span>
-        <div>
-            <button id="btn-market" class="active" onclick="showPage('market')">🛒 Market Vendor Registration</button>
-            <button id="btn-disaster" onclick="showPage('disaster')">🌧️ Disaster Preparedness Survey</button>
+    <header class="hero">
+        <div class="hero-inner">
+            <div class="hero-copy">
+                <div class="hero-meta">Philippines-wide Coverage</div>
+                <h1 id="hero-title">Market Vendor Registration Form</h1>
+                <p id="hero-description">
+                    Clean, centralized forms for vendor registration and household disaster readiness,
+                    designed for fast reporting across the Philippines.
+                </p>
+            </div>
+            <div class="hero-panel">
+                <div class="hero-seal" aria-hidden="true"></div>
+                <div class="hero-actions">
+                    <button class="hero-cta hero-secondary is-hidden" id="hero-home-btn" onclick="showPage('home')">Home</button>
+                    <button class="hero-cta" id="hero-market-btn" onclick="showPage('market')">Market Vendor Registration Form</button>
+                    <button class="hero-cta hero-secondary" id="hero-disaster-btn" onclick="showPage('disaster')">Disaster Preparedness Survey</button>
+                </div>
+            </div>
         </div>
-    </nav>
-
+    </header>
 
     <!-- ============================================================ -->
     <!--            PAGE 1: PUBLIC MARKET VENDOR REGISTRATION        -->
     <!-- ============================================================ -->
-    <div id="market-page" class="page">
+    <div id="market-page" class="page" style="display:none;">
 
         <h1>Public Market Vendor Registration Form</h1>
 
@@ -40,8 +52,15 @@
 
             <!-- ABELARDE SECTION START -->
             <div id="abelarde-section">
+                <div class="section-head">
+                    <span class="section-icon">🏪</span>
+                    <div>
+                        <div class="section-title">Vendor Details</div>
+                        <div class="section-subtitle">Business and stall information</div>
+                    </div>
+                </div>
 
-                <fieldset>
+                <fieldset class="legend-personal">
                     <legend>Personal Information</legend>
 
                     <label for="fullname">Full Name:</label>
@@ -66,14 +85,14 @@
                     <input type="text" id="permit" name="permit" placeholder="e.g. BP-2024-00123">
                 </fieldset>
 
-                <fieldset>
+                <fieldset class="legend-id">
                     <legend>Identification</legend>
 
                     <label for="idType">Valid ID Type:</label>
                     <input type="text" id="idType" name="idType" placeholder="e.g. PhilSys, Driver's License">
 
                     <label for="idNumber">ID Number:</label>
-                    <input type="text" id="idNumber" name="idNumber" placeholder="e.g. 1234-5678-9012">
+                    <input type="text" id="idNumber" name="idNumber" placeholder="e.g. 1234-5678-9012" disabled>
                 </fieldset>
 
             </div>
@@ -81,8 +100,15 @@
 
             <!-- JUAMPIT SECTION START -->
             <div id="juampit-section">
+                <div class="section-head">
+                    <span class="section-icon">✅</span>
+                    <div>
+                        <div class="section-title">Compliance & Sanitation Check</div>
+                        <div class="section-subtitle">Required for market operation permit</div>
+                    </div>
+                </div>
 
-                <fieldset id="compliance-fieldset">
+                <fieldset id="compliance-fieldset" class="legend-compliance">
                     <legend>Compliance Check</legend>
 
                     <p>Sanitary Practices:</p>
@@ -114,7 +140,7 @@
                     </select>
                 </fieldset>
 
-                <fieldset>
+                <fieldset class="legend-agreement">
                     <legend>Agreement</legend>
                     <input type="checkbox" id="agree" name="agree">
                     <label for="agree">I hereby certify that the information provided is true and correct.</label>
@@ -126,6 +152,11 @@
             <!-- JUAMPIT SECTION END -->
 
         </form>
+
+        <div class="form-actions">
+            <button type="button" class="form-action-btn" id="market-top-btn">Back to Top</button>
+            <button type="button" class="form-action-btn" id="market-clear-btn">Clear Form</button>
+        </div>
 
         <!-- TABLE SECTION -->
         <h2>Vendor Registration Records</h2>
@@ -184,8 +215,15 @@
 
             <!-- DINAYA SECTION START -->
             <div id="dinaya-section">
+                <div class="section-head">
+                    <span class="section-icon">🏠</span>
+                    <div>
+                        <div class="section-title">Household Information</div>
+                        <div class="section-subtitle">Basic household details</div>
+                    </div>
+                </div>
 
-                <fieldset>
+                <fieldset class="legend-household">
                     <legend>Household Information</legend>
 
                     <label for="family-name">Family Name:</label>
@@ -203,8 +241,15 @@
 
             <!-- MAYO SECTION START -->
             <div id="mayo-section">
+                <div class="section-head">
+                    <span class="section-icon">🧭</span>
+                    <div>
+                        <div class="section-title">Preparedness Check</div>
+                        <div class="section-subtitle">Risk awareness and readiness status</div>
+                    </div>
+                </div>
 
-                <fieldset>
+                <fieldset class="legend-preparedness">
                     <legend>Preparedness Check</legend>
 
                     <label>1. How would you describe the level of flood/typhoon risk in your area?</label>
@@ -283,6 +328,11 @@
             <!-- MAYO SECTION END -->
 
         </form>
+
+        <div class="form-actions">
+            <button type="button" class="form-action-btn" id="disaster-top-btn">Back to Top</button>
+            <button type="button" class="form-action-btn" id="disaster-clear-btn">Clear Form</button>
+        </div>
 
         <!-- TABLE SECTION -->
         <h2>Disaster Preparedness Survey Records</h2>

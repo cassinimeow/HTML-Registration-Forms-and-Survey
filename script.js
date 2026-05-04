@@ -101,20 +101,140 @@ async function loadDisasterRecords() {
 document.addEventListener('DOMContentLoaded', function() {
     loadMarketRecords();
     loadDisasterRecords();
+    document.getElementById('bg-landing').style.display = 'block';
+    document.getElementById('bg-market').style.display = 'none';
+    document.getElementById('bg-disaster').style.display = 'none';
+    var heroTitle = document.getElementById('hero-title');
+    var heroDescription = document.getElementById('hero-description');
+    if (heroTitle && heroDescription) {
+        heroTitle.textContent = 'Philippines-Wide Registration & Preparedness';
+        heroDescription.textContent = 'Select a form to begin capturing vendor records or disaster readiness data across the country.';
+    }
+    var heroMarketBtn = document.getElementById('hero-market-btn');
+    var heroDisasterBtn = document.getElementById('hero-disaster-btn');
+    var heroHomeBtn = document.getElementById('hero-home-btn');
+    if (heroMarketBtn) heroMarketBtn.classList.remove('is-active');
+    if (heroDisasterBtn) heroDisasterBtn.classList.remove('is-active');
+    if (heroHomeBtn) {
+        heroHomeBtn.classList.remove('is-active');
+        heroHomeBtn.classList.add('is-hidden');
+    }
+
+    var idTypeInput = document.getElementById('idType');
+    var idNumberInput = document.getElementById('idNumber');
+    function syncIdNumberState() {
+        if (!idTypeInput || !idNumberInput) return;
+        var hasType = idTypeInput.value.trim().length > 0;
+        idNumberInput.disabled = !hasType;
+        if (!hasType) idNumberInput.value = '';
+    }
+    if (idTypeInput) {
+        idTypeInput.addEventListener('input', syncIdNumberState);
+    }
+    syncIdNumberState();
+
+    var marketTopBtn = document.getElementById('market-top-btn');
+    var marketClearBtn = document.getElementById('market-clear-btn');
+    var disasterTopBtn = document.getElementById('disaster-top-btn');
+    var disasterClearBtn = document.getElementById('disaster-clear-btn');
+    if (marketTopBtn) {
+        marketTopBtn.addEventListener('click', function() {
+            var target = document.querySelector('.hero');
+            if (target) {
+                var top = target.getBoundingClientRect().top + window.pageYOffset - 16;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    }
+    if (disasterTopBtn) {
+        disasterTopBtn.addEventListener('click', function() {
+            var target = document.querySelector('.hero');
+            if (target) {
+                var top = target.getBoundingClientRect().top + window.pageYOffset - 16;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    }
+    if (marketClearBtn) {
+        marketClearBtn.addEventListener('click', function() {
+            var form = document.getElementById('market-form');
+            if (form) form.reset();
+            var compliance = document.getElementById('compliance-fieldset');
+            if (compliance) compliance.classList.remove('warning-highlight');
+            syncIdNumberState();
+        });
+    }
+    if (disasterClearBtn) {
+        disasterClearBtn.addEventListener('click', function() {
+            var form = document.getElementById('disaster-form');
+            if (form) form.reset();
+            var section = document.getElementById('mayo-section');
+            if (section) {
+                section.style.border = '';
+                section.style.backgroundColor = 'rgba(255,255,255,0.92)';
+            }
+        });
+    }
 });
 
-/* --- Switch pages via navbar --- */
+/* --- Switch pages via hero buttons --- */
 function showPage(page) {
-    document.getElementById('market-page').style.display = 'none';
-    document.getElementById('disaster-page').style.display = 'none';
-    document.getElementById(page + '-page').style.display = 'block';
+    var hero = document.querySelector('.hero');
+    if (hero) hero.classList.add('compact');
+    var marketPage = document.getElementById('market-page');
+    var disasterPage = document.getElementById('disaster-page');
+    if (marketPage) marketPage.style.display = 'none';
+    if (disasterPage) disasterPage.style.display = 'none';
+    var targetPage = document.getElementById(page + '-page');
+    if (targetPage) {
+        targetPage.style.display = 'block';
+        targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
-    document.getElementById('btn-market').classList.remove('active');
-    document.getElementById('btn-disaster').classList.remove('active');
-    document.getElementById('btn-' + page).classList.add('active');
+    var heroTitle = document.getElementById('hero-title');
+    var heroDescription = document.getElementById('hero-description');
+    var heroMarketBtn = document.getElementById('hero-market-btn');
+    var heroDisasterBtn = document.getElementById('hero-disaster-btn');
+    var heroHomeBtn = document.getElementById('hero-home-btn');
+    if (heroTitle && heroDescription) {
+        if (page === 'market') {
+            heroTitle.textContent = 'Market Vendor Registration Form';
+            heroDescription.textContent = 'Register public market vendors with complete identification, compliance, and health certification details.';
+            if (heroMarketBtn) heroMarketBtn.classList.add('is-active');
+            if (heroDisasterBtn) heroDisasterBtn.classList.remove('is-active');
+            if (heroHomeBtn) {
+                heroHomeBtn.classList.remove('is-active');
+                heroHomeBtn.classList.remove('is-hidden');
+            }
+        } else if (page === 'disaster') {
+            heroTitle.textContent = 'Disaster Preparedness Survey';
+            heroDescription.textContent = 'Capture household risk awareness, evacuation planning, and emergency kit readiness across communities.';
+            if (heroDisasterBtn) heroDisasterBtn.classList.add('is-active');
+            if (heroMarketBtn) heroMarketBtn.classList.remove('is-active');
+            if (heroHomeBtn) {
+                heroHomeBtn.classList.remove('is-active');
+                heroHomeBtn.classList.remove('is-hidden');
+            }
+        } else if (page === 'home') {
+            heroTitle.textContent = 'Philippines-Wide Registration & Preparedness';
+            heroDescription.textContent = 'Select a form to begin capturing vendor records or disaster readiness data across the country.';
+            if (heroMarketBtn) heroMarketBtn.classList.remove('is-active');
+            if (heroDisasterBtn) heroDisasterBtn.classList.remove('is-active');
+            if (heroHomeBtn) {
+                heroHomeBtn.classList.add('is-active');
+                heroHomeBtn.classList.add('is-hidden');
+            }
+        }
+    }
 
+    document.getElementById('bg-landing').style.display = page === 'home' ? 'block' : 'none';
     document.getElementById('bg-market').style.display = page === 'market' ? 'block' : 'none';
     document.getElementById('bg-disaster').style.display = page === 'disaster' ? 'block' : 'none';
+
+    if (page === 'home') {
+        if (hero) hero.classList.remove('compact');
+        document.querySelector('.hero').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 /* --- Warning highlight: Poor sanitary practice --- */
