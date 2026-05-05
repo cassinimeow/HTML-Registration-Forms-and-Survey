@@ -89,7 +89,21 @@
                     <legend>Identification</legend>
 
                     <label for="idType">Valid ID Type:</label>
-                    <input type="text" id="idType" name="idType" placeholder="e.g. PhilSys, Driver's License">
+                    <select id="idType" name="idType">
+                        <option value="">Select an ID type (optional)</option>
+                        <option value="PhilSys (National ID)">PhilSys (National ID)</option>
+                        <option value="Philippine Passport">Philippine Passport</option>
+                        <option value="Driver's License">Driver's License</option>
+                        <option value="UMID">UMID</option>
+                        <option value="SSS ID">SSS ID</option>
+                        <option value="GSIS ID">GSIS ID</option>
+                        <option value="PRC ID">PRC ID</option>
+                        <option value="Postal ID">Postal ID</option>
+                        <option value="PhilHealth ID">PhilHealth ID</option>
+                        <option value="TIN ID">TIN ID</option>
+                        <option value="Voter's ID">Voter's ID</option>
+                        <option value="Other">Other</option>
+                    </select>
 
                     <label for="idNumber">ID Number:</label>
                     <input type="text" id="idNumber" name="idNumber" placeholder="e.g. 1234-5678-9012" disabled>
