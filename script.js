@@ -12,35 +12,64 @@ function clearPlaceholderRow(tbody, colSpan) {
     }
 }
 
+function formatAddress(parts) {
+    var cleaned = parts.map(function(part) {
+        return part ? part.trim() : '';
+    }).filter(function(part) {
+        return part.length > 0;
+    });
+    return cleaned.length ? cleaned.join(', ') : '—';
+}
+
+function getInputValue(id) {
+    var el = document.getElementById(id);
+    return el ? el.value : '';
+}
+
 function renderMarketRow(row) {
-    var tbody = document.getElementById('market-table-body');
-    clearPlaceholderRow(tbody, 13);
-    var tr = document.createElement('tr');
-    if (row.sanitary === 'Poor' || row.wasteSeg === 'No') tr.classList.add('non-compliant');
-    tr.innerHTML =
+    var detailsBody = document.getElementById('market-details-body');
+    var complianceBody = document.getElementById('market-compliance-body');
+    clearPlaceholderRow(detailsBody, 9);
+    clearPlaceholderRow(complianceBody, 5);
+
+    var detailsRow = document.createElement('tr');
+    var complianceRow = document.createElement('tr');
+    detailsRow.innerHTML =
         '<td>' + row.fullname + '</td><td>' + row.address + '</td>' +
         '<td>' + row.contact + '</td><td>' + row.businessName + '</td>' +
         '<td>' + row.stall + '</td><td>' + row.goods + '</td>' +
         '<td>' + row.permit + '</td><td>' + row.idType + '</td>' +
-        '<td>' + row.idNumber + '</td><td>' + row.sanitary + '</td>' +
+        '<td>' + row.idNumber + '</td>';
+    complianceRow.innerHTML =
+        '<td>' + row.fullname + '</td><td>' + row.sanitary + '</td>' +
         '<td>' + row.cleanliness + '</td><td>' + row.wasteSeg + '</td>' +
         '<td>' + row.healthCert + '</td>';
-    tbody.appendChild(tr);
+    if (row.sanitary === 'Poor' || row.wasteSeg === 'No') {
+        complianceRow.classList.add('non-compliant');
+    }
+    detailsBody.appendChild(detailsRow);
+    complianceBody.appendChild(complianceRow);
 }
 
 function renderDisasterRow(row) {
-    var tbody = document.getElementById('disaster-table-body');
-    clearPlaceholderRow(tbody, 12);
-    var tr = document.createElement('tr');
-    if (row.kit === 'No') tr.classList.add('non-compliant');
-    tr.innerHTML =
+    var householdBody = document.getElementById('disaster-household-body');
+    var preparednessBody = document.getElementById('disaster-preparedness-body');
+    clearPlaceholderRow(householdBody, 3);
+    clearPlaceholderRow(preparednessBody, 10);
+    var householdRow = document.createElement('tr');
+    var preparednessRow = document.createElement('tr');
+    householdRow.innerHTML =
         '<td>' + row.familyName + '</td><td>' + row.address + '</td>' +
-        '<td>' + row.members + '</td><td>' + row.risk + '</td>' +
+        '<td>' + row.members + '</td>';
+    preparednessRow.innerHTML =
+        '<td>' + row.familyName + '</td><td>' + row.risk + '</td>' +
         '<td>' + row.pastDisaster + '</td><td>' + row.experience + '</td>' +
         '<td>' + row.evacPoint + '</td><td>' + row.evacPlan + '</td>' +
         '<td>' + row.planDetails + '</td><td>' + row.kit + '</td>' +
         '<td>' + row.kitItems + '</td><td>' + row.kitNeed + '</td>';
-    tbody.appendChild(tr);
+    if (row.kit === 'No') preparednessRow.classList.add('non-compliant');
+    householdBody.appendChild(householdRow);
+    preparednessBody.appendChild(preparednessRow);
 }
 
 async function loadMarketRecords() {
@@ -98,9 +127,163 @@ async function loadDisasterRecords() {
     });
 }
 
+async function loadLandingStats() {
+    var marketCountEl = document.getElementById('market-count');
+    var disasterCountEl = document.getElementById('disaster-count');
+    var totalCountEl = document.getElementById('total-count');
+    var lastUpdatedEl = document.getElementById('last-updated');
+    var marketReportCountEl = document.getElementById('market-report-count');
+    var marketAlertCountEl = document.getElementById('market-alert-count');
+    var marketGoodCountEl = document.getElementById('market-good-count');
+    var marketWasteYesEl = document.getElementById('market-waste-yes');
+    var marketHealthValidEl = document.getElementById('market-health-valid');
+    var disasterReportCountEl = document.getElementById('disaster-report-count');
+    var disasterAlertCountEl = document.getElementById('disaster-alert-count');
+    var disasterHighRiskEl = document.getElementById('disaster-high-risk');
+    var disasterEvacPlanEl = document.getElementById('disaster-evac-plan');
+    var disasterKitYesEl = document.getElementById('disaster-kit-yes');
+    if (!marketCountEl || !disasterCountEl || !totalCountEl || !lastUpdatedEl) return;
+
+    var marketResult = await supabaseClient
+        .from('market_submissions')
+        .select('*', { count: 'exact', head: true });
+    if (!marketResult.error && typeof marketResult.count === 'number') {
+        marketCountEl.textContent = String(marketResult.count);
+    }
+
+    var disasterResult = await supabaseClient
+        .from('disaster_submissions')
+        .select('*', { count: 'exact', head: true });
+    if (!disasterResult.error && typeof disasterResult.count === 'number') {
+        disasterCountEl.textContent = String(disasterResult.count);
+    }
+
+    if (marketReportCountEl) {
+        marketReportCountEl.textContent = marketResult && typeof marketResult.count === 'number'
+            ? String(marketResult.count)
+            : '0';
+    }
+    if (disasterReportCountEl) {
+        disasterReportCountEl.textContent = disasterResult && typeof disasterResult.count === 'number'
+            ? String(disasterResult.count)
+            : '0';
+    }
+
+    if (marketAlertCountEl) {
+        var alertResult = await supabaseClient
+            .from('market_submissions')
+            .select('*', { count: 'exact', head: true })
+            .or('sanitary.eq.Poor,waste_seg.eq.No');
+        marketAlertCountEl.textContent = !alertResult.error && typeof alertResult.count === 'number'
+            ? String(alertResult.count)
+            : '0';
+    }
+
+    if (marketGoodCountEl) {
+        var goodResult = await supabaseClient
+            .from('market_submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('sanitary', 'Good');
+        marketGoodCountEl.textContent = !goodResult.error && typeof goodResult.count === 'number'
+            ? String(goodResult.count)
+            : '0';
+    }
+
+    if (marketWasteYesEl) {
+        var wasteResult = await supabaseClient
+            .from('market_submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('waste_seg', 'Yes');
+        marketWasteYesEl.textContent = !wasteResult.error && typeof wasteResult.count === 'number'
+            ? String(wasteResult.count)
+            : '0';
+    }
+
+    if (marketHealthValidEl) {
+        var healthResult = await supabaseClient
+            .from('market_submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('health_cert', 'Valid');
+        marketHealthValidEl.textContent = !healthResult.error && typeof healthResult.count === 'number'
+            ? String(healthResult.count)
+            : '0';
+    }
+
+    if (disasterAlertCountEl) {
+        var kitResult = await supabaseClient
+            .from('disaster_submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('kit', 'No');
+        disasterAlertCountEl.textContent = !kitResult.error && typeof kitResult.count === 'number'
+            ? String(kitResult.count)
+            : '0';
+    }
+
+    if (disasterHighRiskEl) {
+        var highRiskResult = await supabaseClient
+            .from('disaster_submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('risk', 'High');
+        disasterHighRiskEl.textContent = !highRiskResult.error && typeof highRiskResult.count === 'number'
+            ? String(highRiskResult.count)
+            : '0';
+    }
+
+    if (disasterEvacPlanEl) {
+        var evacPlanResult = await supabaseClient
+            .from('disaster_submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('eplan_answer', 'Yes');
+        disasterEvacPlanEl.textContent = !evacPlanResult.error && typeof evacPlanResult.count === 'number'
+            ? String(evacPlanResult.count)
+            : '0';
+    }
+
+    if (disasterKitYesEl) {
+        var kitYesResult = await supabaseClient
+            .from('disaster_submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('kit', 'Yes');
+        disasterKitYesEl.textContent = !kitYesResult.error && typeof kitYesResult.count === 'number'
+            ? String(kitYesResult.count)
+            : '0';
+    }
+
+    var totalCount = (marketResult && marketResult.count ? marketResult.count : 0) +
+        (disasterResult && disasterResult.count ? disasterResult.count : 0);
+    totalCountEl.textContent = String(totalCount);
+
+    var latestMarket = await supabaseClient
+        .from('market_submissions')
+        .select('created_at')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+    var latestDisaster = await supabaseClient
+        .from('disaster_submissions')
+        .select('created_at')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    var latest = null;
+    if (latestMarket && latestMarket.data && latestMarket.data.created_at) {
+        latest = latestMarket.data.created_at;
+    }
+    if (latestDisaster && latestDisaster.data && latestDisaster.data.created_at) {
+        if (!latest || new Date(latestDisaster.data.created_at) > new Date(latest)) {
+            latest = latestDisaster.data.created_at;
+        }
+    }
+    if (latest) {
+        lastUpdatedEl.textContent = new Date(latest).toLocaleString();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     loadMarketRecords();
     loadDisasterRecords();
+    loadLandingStats();
     document.getElementById('bg-landing').style.display = 'block';
     document.getElementById('bg-market').style.display = 'none';
     document.getElementById('bg-disaster').style.display = 'none';
@@ -113,12 +296,18 @@ document.addEventListener('DOMContentLoaded', function() {
     var heroMarketBtn = document.getElementById('hero-market-btn');
     var heroDisasterBtn = document.getElementById('hero-disaster-btn');
     var heroHomeBtn = document.getElementById('hero-home-btn');
+    var devTeam = document.getElementById('dev-team');
+    var landingFooter = document.getElementById('landing-footer');
     if (heroMarketBtn) heroMarketBtn.classList.remove('is-active');
     if (heroDisasterBtn) heroDisasterBtn.classList.remove('is-active');
     if (heroHomeBtn) {
         heroHomeBtn.classList.remove('is-active');
         heroHomeBtn.classList.add('is-hidden');
     }
+    document.body.classList.remove('theme-market', 'theme-disaster', 'theme-landing');
+    document.body.classList.add('theme-landing');
+    if (devTeam) devTeam.style.display = 'block';
+    if (landingFooter) landingFooter.style.display = 'block';
 
     var idTypeInput = document.getElementById('idType');
     var idNumberInput = document.getElementById('idNumber');
@@ -135,8 +324,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var marketTopBtn = document.getElementById('market-top-btn');
     var marketClearBtn = document.getElementById('market-clear-btn');
+    var marketReportBtn = document.getElementById('market-report-btn');
     var disasterTopBtn = document.getElementById('disaster-top-btn');
     var disasterClearBtn = document.getElementById('disaster-clear-btn');
+    var disasterReportBtn = document.getElementById('disaster-report-btn');
+    var marketFormWrap = document.getElementById('market-form-wrap');
+    var marketReports = document.getElementById('market-reports');
+    var disasterFormWrap = document.getElementById('disaster-form-wrap');
+    var disasterReports = document.getElementById('disaster-reports');
+    var disasterMap = document.getElementById('disaster-map');
+    var disasterMapBtn = document.getElementById('disaster-map-btn');
+    var marketFormBtn = document.getElementById('market-form-btn');
+    var disasterFormBtn = document.getElementById('disaster-form-btn');
     if (marketTopBtn) {
         marketTopBtn.addEventListener('click', function() {
             var target = document.querySelector('.hero');
@@ -151,6 +350,65 @@ document.addEventListener('DOMContentLoaded', function() {
             var target = document.querySelector('.hero');
             if (target) {
                 var top = target.getBoundingClientRect().top + window.pageYOffset - 16;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    }
+    if (marketReportBtn) {
+        marketReportBtn.addEventListener('click', function() {
+            var showingReports = marketReports && marketReports.style.display === 'block';
+            if (marketFormWrap) marketFormWrap.style.display = showingReports ? 'block' : 'none';
+            if (marketReports) marketReports.style.display = showingReports ? 'none' : 'block';
+            var target = showingReports ? marketFormWrap : marketReports;
+            if (target) {
+                var top = target.getBoundingClientRect().top + window.pageYOffset - 8;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    }
+    if (disasterReportBtn) {
+        disasterReportBtn.addEventListener('click', function() {
+            var showingReports = disasterReports && disasterReports.style.display === 'block';
+            if (disasterFormWrap) disasterFormWrap.style.display = showingReports ? 'block' : 'none';
+            if (disasterReports) disasterReports.style.display = showingReports ? 'none' : 'block';
+            if (disasterMap) disasterMap.style.display = 'none';
+            var target = showingReports ? disasterFormWrap : disasterReports;
+            if (target) {
+                var top = target.getBoundingClientRect().top + window.pageYOffset - 8;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    }
+    if (disasterMapBtn) {
+        disasterMapBtn.addEventListener('click', function() {
+            var showingMap = disasterMap && disasterMap.style.display === 'block';
+            if (disasterFormWrap) disasterFormWrap.style.display = showingMap ? 'block' : 'none';
+            if (disasterReports) disasterReports.style.display = 'none';
+            if (disasterMap) disasterMap.style.display = showingMap ? 'none' : 'block';
+            var target = showingMap ? disasterFormWrap : disasterMap;
+            if (target) {
+                var top = target.getBoundingClientRect().top + window.pageYOffset - 8;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    }
+    if (marketFormBtn) {
+        marketFormBtn.addEventListener('click', function() {
+            if (marketFormWrap) marketFormWrap.style.display = 'block';
+            if (marketReports) marketReports.style.display = 'none';
+            if (marketFormWrap) {
+                var top = marketFormWrap.getBoundingClientRect().top + window.pageYOffset - 8;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    }
+    if (disasterFormBtn) {
+        disasterFormBtn.addEventListener('click', function() {
+            if (disasterFormWrap) disasterFormWrap.style.display = 'block';
+            if (disasterReports) disasterReports.style.display = 'none';
+            if (disasterMap) disasterMap.style.display = 'none';
+            if (disasterFormWrap) {
+                var top = disasterFormWrap.getBoundingClientRect().top + window.pageYOffset - 8;
                 window.scrollTo({ top: top, behavior: 'smooth' });
             }
         });
@@ -188,7 +446,10 @@ function showPage(page) {
     var targetPage = document.getElementById(page + '-page');
     if (targetPage) {
         targetPage.style.display = 'block';
-        targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        requestAnimationFrame(function() {
+            var top = targetPage.getBoundingClientRect().top + window.pageYOffset - 8;
+            window.scrollTo({ top: top, behavior: 'smooth' });
+        });
     }
 
     var heroTitle = document.getElementById('hero-title');
@@ -196,6 +457,9 @@ function showPage(page) {
     var heroMarketBtn = document.getElementById('hero-market-btn');
     var heroDisasterBtn = document.getElementById('hero-disaster-btn');
     var heroHomeBtn = document.getElementById('hero-home-btn');
+    var devTeam = document.getElementById('dev-team');
+    var landingFooter = document.getElementById('landing-footer');
+    document.body.classList.remove('theme-market', 'theme-disaster', 'theme-landing');
     if (heroTitle && heroDescription) {
         if (page === 'market') {
             heroTitle.textContent = 'Market Vendor Registration Form';
@@ -206,6 +470,7 @@ function showPage(page) {
                 heroHomeBtn.classList.remove('is-active');
                 heroHomeBtn.classList.remove('is-hidden');
             }
+            document.body.classList.add('theme-market');
         } else if (page === 'disaster') {
             heroTitle.textContent = 'Disaster Preparedness Survey';
             heroDescription.textContent = 'Capture household risk awareness, evacuation planning, and emergency kit readiness across communities.';
@@ -215,6 +480,7 @@ function showPage(page) {
                 heroHomeBtn.classList.remove('is-active');
                 heroHomeBtn.classList.remove('is-hidden');
             }
+            document.body.classList.add('theme-disaster');
         } else if (page === 'home') {
             heroTitle.textContent = 'Philippines-Wide Registration & Preparedness';
             heroDescription.textContent = 'Select a form to begin capturing vendor records or disaster readiness data across the country.';
@@ -224,8 +490,12 @@ function showPage(page) {
                 heroHomeBtn.classList.add('is-active');
                 heroHomeBtn.classList.add('is-hidden');
             }
+            document.body.classList.add('theme-landing');
         }
     }
+
+    if (devTeam) devTeam.style.display = page === 'home' ? 'block' : 'none';
+    if (landingFooter) landingFooter.style.display = page === 'home' ? 'block' : 'none';
 
     document.getElementById('bg-landing').style.display = page === 'home' ? 'block' : 'none';
     document.getElementById('bg-market').style.display = page === 'market' ? 'block' : 'none';
@@ -234,6 +504,22 @@ function showPage(page) {
     if (page === 'home') {
         if (hero) hero.classList.remove('compact');
         document.querySelector('.hero').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        loadLandingStats();
+    }
+
+    if (page === 'market') {
+        var marketFormWrap = document.getElementById('market-form-wrap');
+        var marketReports = document.getElementById('market-reports');
+        if (marketFormWrap) marketFormWrap.style.display = 'block';
+        if (marketReports) marketReports.style.display = 'none';
+    }
+    if (page === 'disaster') {
+        var disasterFormWrap = document.getElementById('disaster-form-wrap');
+        var disasterReports = document.getElementById('disaster-reports');
+        var disasterMap = document.getElementById('disaster-map');
+        if (disasterFormWrap) disasterFormWrap.style.display = 'block';
+        if (disasterReports) disasterReports.style.display = 'none';
+        if (disasterMap) disasterMap.style.display = 'none';
     }
 }
 
@@ -254,7 +540,14 @@ document.getElementById('market-form').addEventListener('submit', async function
     document.querySelectorAll('input[name="cleanliness[]"]:checked').forEach(function(cb) { cleanlinessItems.push(cb.value); });
     var row = {
         fullname:     document.getElementById('fullname').value || '—',
-        address:      document.getElementById('address').value || '—',
+        address:      formatAddress([
+            getInputValue('addressStreet'),
+            getInputValue('addressSubdivision'),
+            getInputValue('addressBarangay'),
+            getInputValue('addressCity'),
+            getInputValue('addressProvince'),
+            getInputValue('addressRegion')
+        ]),
         contact:      document.getElementById('contact').value || '—',
         businessName: document.getElementById('businessName').value || '—',
         stall:        document.getElementById('stall').value || '—',
@@ -294,6 +587,7 @@ document.getElementById('market-form').addEventListener('submit', async function
     renderMarketRow(row);
     this.reset();
     document.getElementById('compliance-fieldset').classList.remove('warning-highlight');
+    loadLandingStats();
 });
 
 /* --- Warning highlight: No emergency kit --- */
@@ -324,7 +618,14 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
     document.querySelectorAll('input[name="kit_items"]:checked').forEach(function(cb) { kitItems.push(cb.value); });
     var row = {
         familyName: document.getElementById('family-name').value || '—',
-        address:    document.getElementById('d-address').value || '—',
+        address:    formatAddress([
+            getInputValue('d-address-street'),
+            getInputValue('d-address-subdivision'),
+            getInputValue('d-address-barangay'),
+            getInputValue('d-address-city'),
+            getInputValue('d-address-province'),
+            getInputValue('d-address-region')
+        ]),
         members:    document.getElementById('family-members').value || '—',
         risk:       document.getElementById('risk').value,
         pastDisaster: pastDisaster ? pastDisaster.value : '—',
@@ -363,16 +664,17 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
     this.reset();
     document.getElementById('mayo-section').style.border = '';
     document.getElementById('mayo-section').style.backgroundColor = 'rgba(255,255,255,0.92)';
+    loadLandingStats();
 });
 
 /* --- Export to CSV (simulated Excel export) --- */
 function exportToCSV() {
-    var headers = ['Full Name','Address','Contact','Business Name','Stall No.','Goods Sold','Permit No.','ID Type','ID Number','Sanitary','Cleanliness','Waste Seg.','Health Cert.'];
+    var headers = ['Full Name','Address','Contact','Business Name','Stall No.','Goods Sold','Permit No.','ID Type','ID Number'];
     var rows = [headers];
-    var tbody = document.getElementById('market-table-body');
+    var tbody = document.getElementById('market-details-body');
     for (var i = 0; i < tbody.rows.length; i++) {
         var cells = tbody.rows[i].cells;
-        if (cells[0].colSpan == 13) continue;
+        if (cells[0].colSpan == 9) continue;
         var row = [];
         for (var j = 0; j < cells.length; j++) row.push('"' + cells[j].innerText + '"');
         rows.push(row);

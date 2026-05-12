@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebDev Assessment #1</title>
-    <link rel="icon" href="ph-coat-of-arms.png">
+    <link rel="icon" href="assets/ph-coat-of-arms.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap">
 
     <!-- AGUILA: External CSS -->
@@ -41,14 +41,79 @@
         </div>
     </header>
 
+   <section class="dev-team" id="dev-team" aria-label="Developers">
+    <h2 class="dev-team-title">System Developers</h2>
+    <div class="dev-team-grid">
+        <div class="dev-card">
+            <div class="dev-photo" style="background-image: url('assets/dev_pfp/aguilander.jpg')" aria-hidden="true"></div>
+            <div class="dev-name">Elizander Aguila</div>
+            <div class="dev-role">Styling, Functionality and Database</div>
+        </div>
+        <div class="dev-card">
+            <div class="dev-photo" style="background-image: url('assets/dev_pfp/abelarde.jpg')" aria-hidden="true"></div>
+            <div class="dev-name">Christian Abelarde</div>
+            <div class="dev-role">Market form: Vendor details section</div>
+        </div>
+        <div class="dev-card">
+            <div class="dev-photo" style="background-image: url('assets/dev_pfp/dinaya.jpg')" aria-hidden="true"></div>
+            <div class="dev-name">Johann Mcwee Dinaya</div>
+            <div class="dev-role">Disaster form: Household information section</div>
+        </div>
+        <div class="dev-card">
+            <div class="dev-photo" style="background-image: url('assets/dev_pfp/mayo.jpg')" aria-hidden="true"></div>
+            <div class="dev-name">Xyra Mayo</div>
+            <div class="dev-role">Disaster form: Preparedness check section</div>
+        </div>
+        <div class="dev-card">
+            <div class="dev-photo" style="background-image: url('assets/dev_pfp/juampit.jpg')" aria-hidden="true"></div>
+            <div class="dev-name">Edrian Juampit</div>
+            <div class="dev-role">Market form: Compliance & sanitation section</div>
+        </div>
+    </div>
+</section>
+
+    <footer class="landing-footer" id="landing-footer" aria-label="Site analytics">
+        <div class="landing-footer-inner">
+            <div class="footer-stat">
+                <div class="stat-label">Market form submissions</div>
+                <div class="stat-value" id="market-count">0</div>
+            </div>
+            <div class="footer-stat">
+                <div class="stat-label">Disaster survey submissions</div>
+                <div class="stat-value" id="disaster-count">0</div>
+            </div>
+            <div class="footer-stat">
+                <div class="stat-label">Total submissions</div>
+                <div class="stat-value" id="total-count">0</div>
+            </div>
+            <div class="footer-stat">
+                <div class="stat-label">Last updated</div>
+                <div class="stat-value" id="last-updated">—</div>
+            </div>
+            <div class="footer-meta">
+                <div class="stat-label">Project repository</div>
+                <a class="repo-link" href="https://github.com/cassinimeow/HTML-Registration-Forms-and-Survey" target="_blank" rel="noopener" aria-label="GitHub repository">
+                    <svg class="repo-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.86 8.32 6.84 9.67.5.1.68-.22.68-.49 0-.24-.01-1.04-.01-1.88-2.78.62-3.37-1.1-3.37-1.1-.45-1.19-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.08 1.53 1.08.9 1.57 2.36 1.12 2.94.85.09-.67.35-1.12.64-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.33.1-2.77 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 2.5-.35c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.05 2.74-1.05.55 1.44.2 2.51.1 2.77.64.72 1.03 1.64 1.03 2.76 0 3.93-2.35 4.8-4.58 5.06.36.33.69.97.69 1.96 0 1.42-.01 2.56-.01 2.91 0 .27.18.6.69.49 3.98-1.35 6.84-5.17 6.84-9.67C22 6.58 17.52 2 12 2z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
     <!-- ============================================================ -->
     <!--            PAGE 1: PUBLIC MARKET VENDOR REGISTRATION        -->
     <!-- ============================================================ -->
     <div id="market-page" class="page" style="display:none;">
 
         <h1>Public Market Vendor Registration Form</h1>
+        <div class="page-actions">
+            <button type="button" class="form-action-btn" id="market-report-btn">Table Report</button>
+            <button type="button" class="form-action-btn" id="market-form-btn">Back to Form</button>
+        </div>
 
-        <form id="market-form">
+        <div id="market-form-wrap">
+            <form id="market-form">
 
             <!-- ABELARDE SECTION START -->
             <div id="abelarde-section">
@@ -66,8 +131,33 @@
                     <label for="fullname">Full Name:</label>
                     <input type="text" id="fullname" name="fullname" placeholder="e.g. Juan Dela Cruz">
 
-                    <label for="address">Home Address:</label>
-                    <input type="text" id="address" name="address" placeholder="e.g. 123 Rizal St., Barangay Uno">
+                    <label>Home Address:</label>
+                    <div class="address-grid">
+                        <div class="address-field">
+                            <label for="addressStreet">Street Name</label>
+                            <input type="text" id="addressStreet" name="address_street" placeholder="e.g. 123 Rizal St.">
+                        </div>
+                        <div class="address-field">
+                            <label for="addressSubdivision">Subdivision (optional)</label>
+                            <input type="text" id="addressSubdivision" name="address_subdivision" placeholder="e.g. Sunshine Village">
+                        </div>
+                        <div class="address-field">
+                            <label for="addressBarangay">Barangay</label>
+                            <input type="text" id="addressBarangay" name="address_barangay" placeholder="e.g. Barangay Uno">
+                        </div>
+                        <div class="address-field">
+                            <label for="addressCity">City / Municipality</label>
+                            <input type="text" id="addressCity" name="address_city" placeholder="e.g. Batac City">
+                        </div>
+                        <div class="address-field">
+                            <label for="addressProvince">Province</label>
+                            <input type="text" id="addressProvince" name="address_province" placeholder="e.g. Ilocos Norte">
+                        </div>
+                        <div class="address-field">
+                            <label for="addressRegion">Region</label>
+                            <input type="text" id="addressRegion" name="address_region" placeholder="e.g. Region I">
+                        </div>
+                    </div>
 
                     <label for="contact">Contact Number:</label>
                     <input type="text" id="contact" name="contact" placeholder="e.g. 09XXXXXXXXX">
@@ -165,39 +255,83 @@
             </div>
             <!-- JUAMPIT SECTION END -->
 
-        </form>
+            </form>
 
-        <div class="form-actions">
-            <button type="button" class="form-action-btn" id="market-top-btn">Back to Top</button>
-            <button type="button" class="form-action-btn" id="market-clear-btn">Clear Form</button>
+            <div class="form-actions">
+                <button type="button" class="form-action-btn" id="market-top-btn">Back to Top</button>
+                <button type="button" class="form-action-btn" id="market-clear-btn">Clear Form</button>
+            </div>
         </div>
 
         <!-- TABLE SECTION -->
-        <h2>Vendor Registration Records</h2>
-        <button id="export-btn" onclick="exportToCSV()">⬇️ Export to Excel (CSV)</button>
-        <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Full Name</th>
-                        <th>Address</th>
-                        <th>Contact</th>
-                        <th>Business Name</th>
-                        <th>Stall No.</th>
-                        <th>Goods Sold</th>
-                        <th>Permit No.</th>
-                        <th>ID Type</th>
-                        <th>ID Number</th>
-                        <th>Sanitary</th>
-                        <th>Cleanliness</th>
-                        <th>Waste Seg.</th>
-                        <th>Health Cert.</th>
-                    </tr>
-                </thead>
-                <tbody id="market-table-body">
-                    <tr><td colspan="13" style="text-align:center; color:#888;">No records yet.</td></tr>
-                </tbody>
-            </table>
+        <div id="market-reports" class="report-section" style="display:none;">
+            <div class="report-card">
+                <div class="report-analytics">
+                    <div class="report-stat">
+                        <div class="stat-label">Total vendor records</div>
+                        <div class="stat-value" id="market-report-count">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Compliance alerts</div>
+                        <div class="stat-value" id="market-alert-count">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Sanitary: good</div>
+                        <div class="stat-value" id="market-good-count">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Waste segregation: yes</div>
+                        <div class="stat-value" id="market-waste-yes">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Health cert: valid</div>
+                        <div class="stat-value" id="market-health-valid">0</div>
+                    </div>
+                    <div class="report-actions">
+                        <button id="export-btn" onclick="exportToCSV()">⬇️ Export to Excel (CSV)</button>
+                    </div>
+                </div>
+
+                <h2 class="report-head"><span class="report-icon">🏪</span>Vendor Details Report</h2>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Address</th>
+                                <th>Contact</th>
+                                <th>Business Name</th>
+                                <th>Stall No.</th>
+                                <th>Goods Sold</th>
+                                <th>Permit No.</th>
+                                <th>ID Type</th>
+                                <th>ID Number</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-details-body">
+                            <tr><td colspan="9" style="text-align:center; color:#888;">No records yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 class="report-head"><span class="report-icon">✅</span>Compliance Check Report</h2>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Sanitary</th>
+                                <th>Cleanliness</th>
+                                <th>Waste Seg.</th>
+                                <th>Health Cert.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-compliance-body">
+                            <tr><td colspan="5" style="text-align:center; color:#888;">No records yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -210,22 +344,14 @@
     <div id="disaster-page" class="page" style="display:none;">
 
         <h1>Disaster Preparedness Survey</h1>
-
-        <!-- AGUILA: Map placeholder -->
-        <div id="map-placeholder">
-            <iframe
-                title="HazardHunterPH map view"
-                src="https://hazardhunter.georisk.gov.ph/map"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-            <div class="map-caption">
-                Data source: HazardHunterPH (PHIVOLCS). If the map does not load, open the
-                <a href="https://hazardhunter.georisk.gov.ph/map" target="_blank" rel="noopener">map view</a>.
-            </div>
+        <div class="page-actions">
+            <button type="button" class="form-action-btn" id="disaster-report-btn">Table Report</button>
+            <button type="button" class="form-action-btn" id="disaster-map-btn">GIS Map Layer</button>
+            <button type="button" class="form-action-btn" id="disaster-form-btn">Back to Form</button>
         </div>
 
-        <form id="disaster-form">
+        <div id="disaster-form-wrap">
+            <form id="disaster-form">
 
             <!-- DINAYA SECTION START -->
             <div id="dinaya-section">
@@ -243,8 +369,33 @@
                     <label for="family-name">Family Name:</label>
                     <input type="text" id="family-name" name="family_name" placeholder="e.g. Dela Cruz">
 
-                    <label for="d-address">Address:</label>
-                    <input type="text" id="d-address" name="address" placeholder="e.g. 123 Rizal St., Barangay Uno">
+                    <label>Address:</label>
+                    <div class="address-grid">
+                        <div class="address-field">
+                            <label for="d-address-street">Street Name</label>
+                            <input type="text" id="d-address-street" name="d_address_street" placeholder="e.g. 123 Rizal St.">
+                        </div>
+                        <div class="address-field">
+                            <label for="d-address-subdivision">Subdivision (optional)</label>
+                            <input type="text" id="d-address-subdivision" name="d_address_subdivision" placeholder="e.g. Sunshine Village">
+                        </div>
+                        <div class="address-field">
+                            <label for="d-address-barangay">Barangay</label>
+                            <input type="text" id="d-address-barangay" name="d_address_barangay" placeholder="e.g. Barangay Uno">
+                        </div>
+                        <div class="address-field">
+                            <label for="d-address-city">City / Municipality</label>
+                            <input type="text" id="d-address-city" name="d_address_city" placeholder="e.g. Batac City">
+                        </div>
+                        <div class="address-field">
+                            <label for="d-address-province">Province</label>
+                            <input type="text" id="d-address-province" name="d_address_province" placeholder="e.g. Ilocos Norte">
+                        </div>
+                        <div class="address-field">
+                            <label for="d-address-region">Region</label>
+                            <input type="text" id="d-address-region" name="d_address_region" placeholder="e.g. Region I">
+                        </div>
+                    </div>
 
                     <label for="family-members">Number of Family Members:</label>
                     <input type="number" id="family-members" name="family_members" min="1" placeholder="e.g. 5">
@@ -341,38 +492,96 @@
             </div>
             <!-- MAYO SECTION END -->
 
-        </form>
+            </form>
 
-        <div class="form-actions">
-            <button type="button" class="form-action-btn" id="disaster-top-btn">Back to Top</button>
-            <button type="button" class="form-action-btn" id="disaster-clear-btn">Clear Form</button>
+            <div class="form-actions">
+                <button type="button" class="form-action-btn" id="disaster-top-btn">Back to Top</button>
+                <button type="button" class="form-action-btn" id="disaster-clear-btn">Clear Form</button>
+            </div>
+        </div>
+
+        <!-- AGUILA: Map placeholder -->
+        <div id="disaster-map" style="display:none;">
+            <div id="map-placeholder">
+            <iframe
+                title="HazardHunterPH map view"
+                src="https://hazardhunter.georisk.gov.ph/map"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            <div class="map-caption">
+                Data source: HazardHunterPH (PHIVOLCS). If the map does not load, open the
+                <a href="https://hazardhunter.georisk.gov.ph/map" target="_blank" rel="noopener">map view</a>.
+            </div>
+            </div>
         </div>
 
         <!-- TABLE SECTION -->
-        <h2>Disaster Preparedness Survey Records</h2>
-        <button id="print-btn" onclick="window.print()">🖨️ Print Report</button>
-        <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Family Name</th>
-                        <th>Address</th>
-                        <th>Members</th>
-                        <th>Risk Level</th>
-                        <th>Past Disaster?</th>
-                        <th>Past Experience</th>
-                        <th>Evacuation Point</th>
-                        <th>Evacuation Plan?</th>
-                        <th>Plan Details</th>
-                        <th>Emergency Kit?</th>
-                        <th>Kit Items</th>
-                        <th>Needs Kit?</th>
-                    </tr>
-                </thead>
-                <tbody id="disaster-table-body">
-                    <tr><td colspan="12" style="text-align:center; color:#888;">No records yet.</td></tr>
-                </tbody>
-            </table>
+        <div id="disaster-reports" class="report-section" style="display:none;">
+            <div class="report-card">
+                <div class="report-analytics">
+                    <div class="report-stat">
+                        <div class="stat-label">Total households</div>
+                        <div class="stat-value" id="disaster-report-count">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">No kit reported</div>
+                        <div class="stat-value" id="disaster-alert-count">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">High risk level</div>
+                        <div class="stat-value" id="disaster-high-risk">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Evacuation plan: yes</div>
+                        <div class="stat-value" id="disaster-evac-plan">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Emergency kit: yes</div>
+                        <div class="stat-value" id="disaster-kit-yes">0</div>
+                    </div>
+                </div>
+
+                <h2 class="report-head"><span class="report-icon">🏠</span>Household Information Report</h2>
+                <button id="print-btn" onclick="window.print()">🖨️ Print Report</button>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Family Name</th>
+                                <th>Address</th>
+                                <th>Members</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disaster-household-body">
+                            <tr><td colspan="3" style="text-align:center; color:#888;">No records yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 class="report-head"><span class="report-icon">🧭</span>Preparedness Check Report</h2>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Family Name</th>
+                                <th>Risk Level</th>
+                                <th>Past Disaster?</th>
+                                <th>Past Experience</th>
+                                <th>Evacuation Point</th>
+                                <th>Evacuation Plan?</th>
+                                <th>Plan Details</th>
+                                <th>Emergency Kit?</th>
+                                <th>Kit Items</th>
+                                <th>Needs Kit?</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disaster-preparedness-body">
+                            <tr><td colspan="10" style="text-align:center; color:#888;">No records yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
     </div>
