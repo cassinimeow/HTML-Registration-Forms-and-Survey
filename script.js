@@ -43,6 +43,83 @@ function fetchJson(url) {
     });
 }
 
+function fetchJsonp(url, callbackParam) {
+    return new Promise(function(resolve, reject) {
+        var callbackName = 'jsonp_' + Math.random().toString(36).slice(2);
+        var timeoutId = setTimeout(function() {
+            cleanup();
+            reject(new Error('JSONP timeout'));
+        }, 7000);
+
+        function cleanup() {
+            clearTimeout(timeoutId);
+            delete window[callbackName];
+            if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        window[callbackName] = function(data) {
+            cleanup();
+            resolve(data);
+        };
+
+        var script = document.createElement('script');
+        var sep = url.indexOf('?') === -1 ? '?' : '&';
+        script.src = url + sep + encodeURIComponent(callbackParam) + '=' + encodeURIComponent(callbackName);
+        script.onerror = function() {
+            cleanup();
+            reject(new Error('JSONP request failed'));
+        };
+        document.head.appendChild(script);
+    });
+}
+
+function normalizeLocationText(value) {
+    var text = String(value || '').replace(/\s+/g, ' ').trim();
+    text = text.replace(/^\s*(city|municipality)\s+of\s+/i, '');
+    text = text.replace(/\s*\([^)]*\)\s*/g, ' ');
+    if (text.normalize) {
+        text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+    return text.replace(/\s+/g, ' ').trim();
+}
+
+function geocodeLocation(queries) {
+    var list = Array.isArray(queries) ? queries : [queries];
+    var index = 0;
+
+    function tryNext() {
+        if (index >= list.length) return Promise.reject(new Error('No results'));
+        var query = list[index++];
+        if (!query) return tryNext();
+
+        var photonUrl = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(query) + '&limit=1';
+        return fetchJson(photonUrl)
+            .then(function(data) {
+                if (!data || !data.features || !data.features.length) throw new Error('No results');
+                var coords = data.features[0].geometry.coordinates;
+                return { lat: coords[1], lon: coords[0] };
+            })
+            .catch(function() {
+                var nominatimUrl = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=' + encodeURIComponent(query);
+                return fetchJsonp(nominatimUrl, 'json_callback').then(function(results) {
+                    if (!results || !results.length) throw new Error('No results');
+                    return { lat: results[0].lat, lon: results[0].lon };
+                });
+            })
+            .catch(function() {
+                return tryNext();
+            });
+    }
+
+    return tryNext();
+}
+
+function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, function(ch) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+    });
+}
+
 function setSelectOptions(select, items, placeholder) {
     if (!select) return;
     select.innerHTML = '';
@@ -87,7 +164,7 @@ function initAddressSelectors(config) {
     var regionSelect = document.getElementById(config.regionId);
 
     function resetCityBarangay() {
-        setSelectOptions(citySelect, [], 'Select city / municipality');
+        setSelectOptions(citySelect, [], 'Select city');
         setSelectOptions(barangaySelect, [], 'Select barangay');
     }
 
@@ -97,10 +174,6 @@ function initAddressSelectors(config) {
 
     fetchRegions().then(function(list) {
         setSelectOptions(regionSelect, list, 'Select region');
-    });
-
-    fetchProvinces().then(function(list) {
-        setSelectOptions(provinceSelect, list, 'Select province');
     });
 
     if (regionSelect) {
@@ -115,7 +188,7 @@ function initAddressSelectors(config) {
                 setSelectOptions(provinceSelect, [{ value: code, label: 'Metro Manila' }], 'Select province');
                 provinceSelect.value = code;
                 fetchCities(code).then(function(list) {
-                    setSelectOptions(citySelect, list, 'Select city / municipality');
+                    setSelectOptions(citySelect, list, 'Select city');
                 });
                 return;
             }
@@ -128,11 +201,11 @@ function initAddressSelectors(config) {
     if (provinceSelect) {
         provinceSelect.addEventListener('change', function() {
             var code = provinceSelect.value;
-            setSelectOptions(citySelect, [], 'Select city / municipality');
+            setSelectOptions(citySelect, [], 'Select city');
             setSelectOptions(barangaySelect, [], 'Select barangay');
             if (!code) return;
             fetchCities(code).then(function(list) {
-                setSelectOptions(citySelect, list, 'Select city / municipality');
+                setSelectOptions(citySelect, list, 'Select city');
             });
         });
     }
@@ -149,13 +222,18 @@ function initAddressSelectors(config) {
     }
 }
 
-function fetchProvinces() {
-    return Promise.resolve([]);
-}
-
 function fetchProvinces(regionCode) {
     if (psgcCache.provinces && psgcCache.provinces[regionCode]) {
         return Promise.resolve(psgcCache.provinces[regionCode]);
+    }
+    var regionName = psgcCache.regionNameByCode[regionCode] || '';
+    var isNcr = regionName.toLowerCase().indexOf('national capital region') !== -1 || regionCode === '130000000';
+    if (isNcr) {
+        var ncrList = [{ value: regionCode, label: 'Metro Manila' }];
+        if (!psgcCache.provinces) psgcCache.provinces = {};
+        psgcCache.provinces[regionCode] = ncrList;
+        psgcCache.provinceType[regionCode] = 'region';
+        return Promise.resolve(ncrList);
     }
     return fetchJson('https://psgc.gitlab.io/api/regions/' + regionCode + '/provinces/').then(function(data) {
         var list = data.map(function(item) {
@@ -297,6 +375,48 @@ function renderDisasterRow(row) {
     if (row.kit === 'No') preparednessRow.classList.add('non-compliant');
     householdBody.appendChild(householdRow);
     preparednessBody.appendChild(preparednessRow);
+    renderMapRow(row);
+}
+
+function getAddressParts(address) {
+    if (!address || address === '—') return [];
+    return address.split(',').map(function(part) {
+        return part.trim();
+    }).filter(Boolean);
+}
+
+function getBarangayCityFromAddress(address) {
+    var parts = getAddressParts(address);
+    var last = parts[parts.length - 1] || '';
+    if (/region|ncr|national capital region|metro manila/i.test(last)) {
+        parts = parts.slice(0, -1);
+    }
+    if (parts.length < 2) return { barangay: '—', city: '—' };
+    return {
+        barangay: parts[parts.length - 1] || '—',
+        city: parts[parts.length - 2] || '—'
+    };
+}
+
+function renderMapRow(row) {
+    var mapBody = document.getElementById('map-table-body');
+    if (!mapBody) return;
+    clearPlaceholderRow(mapBody, 4);
+    var loc = {
+        barangay: row.barangay || '',
+        city: row.city || ''
+    };
+    if (!loc.barangay || !loc.city) {
+        loc = getBarangayCityFromAddress(row.address);
+    }
+    var tr = document.createElement('tr');
+    var safeAddress = escapeHtml(row.address || '');
+    tr.innerHTML =
+        '<td>' + row.familyName + '</td>' +
+        '<td>' + loc.barangay + '</td>' +
+        '<td>' + loc.city + '</td>' +
+        '<td><button class="map-zoom-btn" data-barangay="' + loc.barangay + '" data-city="' + loc.city + '" data-address="' + safeAddress + '">🔍 View</button></td>';
+    mapBody.appendChild(tr);
 }
 
 async function loadMarketRecords() {
@@ -688,6 +808,50 @@ document.addEventListener('DOMContentLoaded', function() {
             showToast('Disaster form cleared.', 'info');
         });
     }
+
+    var mapTable = document.getElementById('map-table-body');
+    if (mapTable) {
+        mapTable.addEventListener('click', function(event) {
+            var target = event.target.closest('.map-zoom-btn');
+            if (!target) return;
+            var barangay = target.getAttribute('data-barangay') || '';
+            var city = target.getAttribute('data-city') || '';
+            var address = target.getAttribute('data-address') || '';
+            var cleanAddress = normalizeLocationText(address);
+            var cleanBarangay = normalizeLocationText(barangay);
+            var cleanCity = normalizeLocationText(city);
+            var queryRaw = [address, barangay, city, 'Philippines'].filter(Boolean).join(', ');
+            var queryVariants = [
+                queryRaw,
+                [barangay, city, 'Philippines'].filter(Boolean).join(', '),
+                [cleanBarangay, cleanCity, 'Philippines'].filter(Boolean).join(', '),
+                [cleanCity, 'Philippines'].filter(Boolean).join(', ')
+            ];
+            var iframe = document.querySelector('#map-placeholder iframe');
+            var hazardLink = document.getElementById('hazardhunter-link');
+            if (iframe) {
+                geocodeLocation(queryVariants)
+                    .then(function(point) {
+                        var lat = point.lat;
+                        var lon = point.lon;
+                        var bbox = [
+                            (parseFloat(lon) - 0.01),
+                            (parseFloat(lat) - 0.01),
+                            (parseFloat(lon) + 0.01),
+                            (parseFloat(lat) + 0.01)
+                        ].join('%2C');
+                        iframe.src = 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + lat + '%2C' + lon;
+                        if (hazardLink) hazardLink.href = 'https://hazardhunter.georisk.gov.ph/map#map=14/' + lat + '/' + lon;
+                        showToast('Map focus: ' + [barangay, city].filter(Boolean).join(', '), 'info');
+                    })
+                    .catch(function() {
+                        iframe.src = 'https://www.openstreetmap.org/export/embed.html?bbox=116.9%2C4.5%2C127.1%2C20.8&layer=mapnik';
+                        if (hazardLink) hazardLink.href = 'https://hazardhunter.georisk.gov.ph/map';
+                        showToast('Location not found. Open the map to search.', 'error');
+                    });
+            }
+        });
+    }
 });
 
 /* --- Switch pages via hero buttons --- */
@@ -883,11 +1047,13 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
         address:    formatAddress([
             getInputValue('d-address-street'),
             getInputValue('d-address-subdivision'),
-            getSelectText('d-address-barangay'),
-            getSelectText('d-address-city'),
+            getSelectText('d-address-region'),
             getSelectText('d-address-province'),
-            getSelectText('d-address-region')
+            getSelectText('d-address-city'),
+            getSelectText('d-address-barangay')
         ]),
+        city:       getSelectText('d-address-city') || '—',
+        barangay:   getSelectText('d-address-barangay') || '—',
         members:    document.getElementById('family-members').value || '—',
         risk:       document.getElementById('risk').value,
         pastDisaster: pastDisaster ? pastDisaster.value : '—',

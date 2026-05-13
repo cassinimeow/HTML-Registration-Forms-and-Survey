@@ -910,6 +910,28 @@ tbody tr:hover {
     text-decoration: underline;
 }
 
+.map-report {
+    margin-top: 16px;
+}
+
+.map-zoom-btn {
+    background: #0b6f7a;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "Space Grotesk", "Segoe UI", Arial, sans-serif;
+}
+
+.map-zoom-btn:hover {
+    background: #0a5d66;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 900px) {
     .page {

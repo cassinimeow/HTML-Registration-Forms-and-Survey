@@ -520,15 +520,34 @@
         <div id="disaster-map" style="display:none;">
             <div id="map-placeholder">
             <iframe
-                title="HazardHunterPH map view"
-                src="https://hazardhunter.georisk.gov.ph/map"
+                title="OpenStreetMap view"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=116.9%2C4.5%2C127.1%2C20.8&layer=mapnik"
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade">
             </iframe>
             <div class="map-caption">
-                Data source: HazardHunterPH (PHIVOLCS). If the map does not load, open the
-                <a href="https://hazardhunter.georisk.gov.ph/map" target="_blank" rel="noopener">map view</a>.
+                Map view: OpenStreetMap. For official hazard data, open
+                <a id="hazardhunter-link" href="https://hazardhunter.georisk.gov.ph/map" target="_blank" rel="noopener">HazardHunterPH</a>.
             </div>
+            </div>
+
+            <div class="map-report">
+                <h2 class="report-head"><span class="report-icon">🔎</span>GIS Location Lookup</h2>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Family Name</th>
+                                <th>Barangay</th>
+                                <th>City</th>
+                                <th>Map</th>
+                            </tr>
+                        </thead>
+                        <tbody id="map-table-body">
+                            <tr><td colspan="4" style="text-align:center; color:#888;">No records yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
