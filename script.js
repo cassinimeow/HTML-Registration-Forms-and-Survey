@@ -12,6 +12,233 @@ function clearPlaceholderRow(tbody, colSpan) {
     }
 }
 
+function showToast(message, type) {
+    var stack = document.getElementById('toast-stack');
+    if (!stack) return;
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + (type || 'info');
+    var icon = 'ℹ️';
+    if (type === 'success') icon = '✅';
+    if (type === 'error') icon = '⚠️';
+    toast.innerHTML =
+        '<div class="toast-row">' +
+        '<span class="toast-icon">' + icon + '</span>' +
+        '<span class="toast-message">' + message + '</span>' +
+        '</div>' +
+        '<div class="toast-bar"><span></span></div>';
+    stack.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+        setTimeout(function() {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 200);
+    }, 3000);
+}
+
+function fetchJson(url) {
+    return fetch(url).then(function(res) {
+        if (!res.ok) throw new Error('Request failed');
+        return res.json();
+    });
+}
+
+function setSelectOptions(select, items, placeholder) {
+    if (!select) return;
+    select.innerHTML = '';
+    var option = document.createElement('option');
+    option.value = '';
+    option.textContent = placeholder || 'Select';
+    select.appendChild(option);
+    items.forEach(function(item) {
+        var opt = document.createElement('option');
+        opt.value = item.value;
+        opt.textContent = item.label;
+        select.appendChild(opt);
+    });
+}
+
+function getSelectText(id) {
+    var el = document.getElementById(id);
+    if (!el || !el.value) return '';
+    return el.options[el.selectedIndex].text;
+}
+
+var psgcCache = {
+    provinces: null,
+    cities: {},
+    barangays: {},
+    provincesDetail: {},
+    provinceType: {},
+    regionNameByCode: {},
+    regions: null
+};
+
+function sortByLabel(list) {
+    return list.slice().sort(function(a, b) {
+        return a.label.localeCompare(b.label);
+    });
+}
+
+function initAddressSelectors(config) {
+    var provinceSelect = document.getElementById(config.provinceId);
+    var citySelect = document.getElementById(config.cityId);
+    var barangaySelect = document.getElementById(config.barangayId);
+    var regionSelect = document.getElementById(config.regionId);
+
+    function resetCityBarangay() {
+        setSelectOptions(citySelect, [], 'Select city / municipality');
+        setSelectOptions(barangaySelect, [], 'Select barangay');
+    }
+
+    function resetRegion() {
+        setSelectOptions(regionSelect, [], 'Select region');
+    }
+
+    fetchRegions().then(function(list) {
+        setSelectOptions(regionSelect, list, 'Select region');
+    });
+
+    fetchProvinces().then(function(list) {
+        setSelectOptions(provinceSelect, list, 'Select province');
+    });
+
+    if (regionSelect) {
+        regionSelect.addEventListener('change', function() {
+            var code = regionSelect.value;
+            resetCityBarangay();
+            setSelectOptions(provinceSelect, [], 'Select province');
+            if (!code) return;
+            var regionName = psgcCache.regionNameByCode[code] || '';
+            var isNcr = regionName.toLowerCase().indexOf('national capital region') !== -1 || code === '130000000';
+            if (isNcr) {
+                setSelectOptions(provinceSelect, [{ value: code, label: 'Metro Manila' }], 'Select province');
+                provinceSelect.value = code;
+                fetchCities(code).then(function(list) {
+                    setSelectOptions(citySelect, list, 'Select city / municipality');
+                });
+                return;
+            }
+            fetchProvinces(code).then(function(list) {
+                setSelectOptions(provinceSelect, list, 'Select province');
+            });
+        });
+    }
+
+    if (provinceSelect) {
+        provinceSelect.addEventListener('change', function() {
+            var code = provinceSelect.value;
+            setSelectOptions(citySelect, [], 'Select city / municipality');
+            setSelectOptions(barangaySelect, [], 'Select barangay');
+            if (!code) return;
+            fetchCities(code).then(function(list) {
+                setSelectOptions(citySelect, list, 'Select city / municipality');
+            });
+        });
+    }
+
+    if (citySelect) {
+        citySelect.addEventListener('change', function() {
+            var code = citySelect.value;
+            setSelectOptions(barangaySelect, [], 'Select barangay');
+            if (!code) return;
+            fetchBarangays(code).then(function(list) {
+                setSelectOptions(barangaySelect, list, 'Select barangay');
+            });
+        });
+    }
+}
+
+function fetchProvinces() {
+    return Promise.resolve([]);
+}
+
+function fetchProvinces(regionCode) {
+    if (psgcCache.provinces && psgcCache.provinces[regionCode]) {
+        return Promise.resolve(psgcCache.provinces[regionCode]);
+    }
+    return fetchJson('https://psgc.gitlab.io/api/regions/' + regionCode + '/provinces/').then(function(data) {
+        var list = data.map(function(item) {
+            return { value: item.code, label: item.name };
+        });
+        list = sortByLabel(list);
+        if (!psgcCache.provinces) psgcCache.provinces = {};
+        psgcCache.provinces[regionCode] = list;
+        return list;
+    });
+}
+
+function fetchRegions() {
+    if (psgcCache.regions) return Promise.resolve(psgcCache.regions);
+    return fetchJson('https://psgc.gitlab.io/api/regions/').then(function(data) {
+        var list = data.map(function(region) {
+            if (!region || !region.name) return null;
+            psgcCache.regionNameByCode[region.code] = region.name;
+            psgcCache.provinceType[region.code] = 'region';
+            return { value: region.code, label: region.name };
+        }).filter(Boolean);
+        list = sortByLabel(list);
+        psgcCache.regions = list;
+        return list;
+    });
+}
+
+function fetchCities(provinceCode) {
+    if (psgcCache.cities[provinceCode]) return Promise.resolve(psgcCache.cities[provinceCode]);
+    var endpoint = psgcCache.provinceType[provinceCode] === 'region'
+        ? 'https://psgc.gitlab.io/api/regions/' + provinceCode + '/cities-municipalities/'
+        : 'https://psgc.gitlab.io/api/provinces/' + provinceCode + '/cities-municipalities/';
+    return fetchJson(endpoint).then(function(data) {
+        var list = data.map(function(item) {
+            return { value: item.code, label: item.name };
+        });
+        list = sortByLabel(list);
+        psgcCache.cities[provinceCode] = list;
+        return list;
+    }).catch(function() {
+        if (psgcCache.provinceType[provinceCode] === 'region') {
+            return fetchJson('https://psgc.gitlab.io/api/regions/' + provinceCode + '/cities/').then(function(data) {
+                var list = data.map(function(item) {
+                    return { value: item.code, label: item.name };
+                });
+                list = sortByLabel(list);
+                psgcCache.cities[provinceCode] = list;
+                return list;
+            });
+        }
+        return [];
+    });
+}
+
+function fetchBarangays(cityCode) {
+    if (psgcCache.barangays[cityCode]) return Promise.resolve(psgcCache.barangays[cityCode]);
+    return fetchJson('https://psgc.gitlab.io/api/cities-municipalities/' + cityCode + '/barangays/').then(function(data) {
+        var list = data.map(function(item) {
+            return { value: item.code, label: item.name };
+        });
+        list = sortByLabel(list);
+        psgcCache.barangays[cityCode] = list;
+        return list;
+    }).catch(function() {
+        return fetchJson('https://psgc.gitlab.io/api/cities/' + cityCode + '/barangays/').then(function(data) {
+            var list = data.map(function(item) {
+                return { value: item.code, label: item.name };
+            });
+            list = sortByLabel(list);
+            psgcCache.barangays[cityCode] = list;
+            return list;
+        });
+    });
+}
+
+function fetchProvinceDetail(code) {
+    if (psgcCache.provincesDetail[code]) return Promise.resolve(psgcCache.provincesDetail[code]);
+    return fetchJson('https://psgc.gitlab.io/api/provinces/' + code + '/').then(function(data) {
+        psgcCache.provincesDetail[code] = data;
+        return data;
+    });
+}
+
 function formatAddress(parts) {
     var cleaned = parts.map(function(part) {
         return part ? part.trim() : '';
@@ -284,6 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadMarketRecords();
     loadDisasterRecords();
     loadLandingStats();
+    showToast('Welcome! Select a form to begin.', 'info');
     document.getElementById('bg-landing').style.display = 'block';
     document.getElementById('bg-market').style.display = 'none';
     document.getElementById('bg-disaster').style.display = 'none';
@@ -306,6 +534,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     document.body.classList.remove('theme-market', 'theme-disaster', 'theme-landing');
     document.body.classList.add('theme-landing');
+
+    initAddressSelectors({
+        provinceId: 'addressProvince',
+        cityId: 'addressCity',
+        barangayId: 'addressBarangay',
+        regionId: 'addressRegion'
+    });
+    initAddressSelectors({
+        provinceId: 'd-address-province',
+        cityId: 'd-address-city',
+        barangayId: 'd-address-barangay',
+        regionId: 'd-address-region'
+    });
     if (devTeam) devTeam.style.display = 'block';
     if (landingFooter) landingFooter.style.display = 'block';
 
@@ -420,6 +661,13 @@ document.addEventListener('DOMContentLoaded', function() {
             var compliance = document.getElementById('compliance-fieldset');
             if (compliance) compliance.classList.remove('warning-highlight');
             syncIdNumberState();
+            initAddressSelectors({
+                provinceId: 'addressProvince',
+                cityId: 'addressCity',
+                barangayId: 'addressBarangay',
+                regionId: 'addressRegion'
+            });
+            showToast('Market form cleared.', 'info');
         });
     }
     if (disasterClearBtn) {
@@ -431,6 +679,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 section.style.border = '';
                 section.style.backgroundColor = 'rgba(255,255,255,0.92)';
             }
+            initAddressSelectors({
+                provinceId: 'd-address-province',
+                cityId: 'd-address-city',
+                barangayId: 'd-address-barangay',
+                regionId: 'd-address-region'
+            });
+            showToast('Disaster form cleared.', 'info');
         });
     }
 });
@@ -543,10 +798,10 @@ document.getElementById('market-form').addEventListener('submit', async function
         address:      formatAddress([
             getInputValue('addressStreet'),
             getInputValue('addressSubdivision'),
-            getInputValue('addressBarangay'),
-            getInputValue('addressCity'),
-            getInputValue('addressProvince'),
-            getInputValue('addressRegion')
+            getSelectText('addressBarangay'),
+            getSelectText('addressCity'),
+            getSelectText('addressProvince'),
+            getSelectText('addressRegion')
         ]),
         contact:      document.getElementById('contact').value || '—',
         businessName: document.getElementById('businessName').value || '—',
@@ -588,6 +843,13 @@ document.getElementById('market-form').addEventListener('submit', async function
     this.reset();
     document.getElementById('compliance-fieldset').classList.remove('warning-highlight');
     loadLandingStats();
+    initAddressSelectors({
+        provinceId: 'addressProvince',
+        cityId: 'addressCity',
+        barangayId: 'addressBarangay',
+        regionId: 'addressRegion'
+    });
+    showToast('Vendor record saved.', 'success');
 });
 
 /* --- Warning highlight: No emergency kit --- */
@@ -621,10 +883,10 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
         address:    formatAddress([
             getInputValue('d-address-street'),
             getInputValue('d-address-subdivision'),
-            getInputValue('d-address-barangay'),
-            getInputValue('d-address-city'),
-            getInputValue('d-address-province'),
-            getInputValue('d-address-region')
+            getSelectText('d-address-barangay'),
+            getSelectText('d-address-city'),
+            getSelectText('d-address-province'),
+            getSelectText('d-address-region')
         ]),
         members:    document.getElementById('family-members').value || '—',
         risk:       document.getElementById('risk').value,
@@ -665,6 +927,13 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
     document.getElementById('mayo-section').style.border = '';
     document.getElementById('mayo-section').style.backgroundColor = 'rgba(255,255,255,0.92)';
     loadLandingStats();
+    initAddressSelectors({
+        provinceId: 'd-address-province',
+        cityId: 'd-address-city',
+        barangayId: 'd-address-barangay',
+        regionId: 'd-address-region'
+    });
+    showToast('Survey record saved.', 'success');
 });
 
 /* --- Export to CSV (simulated Excel export) --- */

@@ -10,7 +10,7 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Space Grotesk", "Segoe UI", Arial, sans-serif;
     font-size: 15px;
     color: #222;
     min-height: 100vh;
@@ -338,6 +338,7 @@ body.theme-disaster .hero-inner {
     padding: 12px 18px;
     border-radius: 10px;
     font-size: 14px;
+    font-family: "Space Grotesk", "Segoe UI", Arial, sans-serif;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -536,6 +537,7 @@ body.theme-disaster .hero-inner {
     padding: 8px 14px;
     border-radius: 8px;
     font-size: 13px;
+    font-family: "Space Grotesk", "Segoe UI", Arial, sans-serif;
     cursor: pointer;
     transition: transform 0.15s ease, background-color 0.2s ease;
 }
@@ -618,6 +620,102 @@ label {
     gap: 4px;
 }
 
+.toast-stack {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    display: grid;
+    gap: 10px;
+    z-index: 999;
+}
+
+.toast {
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(232,246,248,0.94));
+    color: #1a2b33;
+    padding: 12px 14px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    border: 1px solid rgba(13, 28, 36, 0.12);
+    min-width: 240px;
+    display: grid;
+    gap: 10px;
+    animation: toast-in 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast.success { border-color: rgba(46, 125, 50, 0.5); }
+.toast.info { border-color: rgba(26, 163, 179, 0.5); }
+.toast.error { border-color: rgba(229, 57, 53, 0.5); }
+
+.toast-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toast-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    background: rgba(26, 163, 179, 0.12);
+    border: 1px solid rgba(26, 163, 179, 0.2);
+}
+
+.toast.success .toast-icon {
+    background: rgba(46, 125, 50, 0.12);
+    border-color: rgba(46, 125, 50, 0.2);
+}
+
+.toast.error .toast-icon {
+    background: rgba(229, 57, 53, 0.12);
+    border-color: rgba(229, 57, 53, 0.2);
+}
+
+.toast-message {
+    font-weight: 600;
+}
+
+.toast-bar {
+    height: 3px;
+    width: 100%;
+    border-radius: 999px;
+    background: rgba(13, 28, 36, 0.08);
+    overflow: hidden;
+}
+
+.toast-bar span {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #1aa3b3, #0b6f7a);
+    transform-origin: left;
+    animation: toast-progress 3s linear forwards;
+}
+
+.toast.success .toast-bar span {
+    background: linear-gradient(90deg, #2e7d32, #1b5e20);
+}
+
+.toast.error .toast-bar span {
+    background: linear-gradient(90deg, #e53935, #b71c1c);
+}
+
+@keyframes toast-in {
+    from { transform: translateY(8px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toast-progress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
 /* === INPUTS === */
 input[type="text"],
 input[type="number"],
@@ -682,6 +780,7 @@ button[type="submit"] {
     padding: 11px 28px;
     border-radius: 6px;
     font-size: 15px;
+    font-family: "Space Grotesk", "Segoe UI", Arial, sans-serif;
     cursor: pointer;
     transition: background-color 0.2s;
     display: block;
@@ -699,6 +798,7 @@ button[type="submit"]:hover {
     padding: 9px 20px;
     border-radius: 6px;
     font-size: 14px;
+    font-family: "Space Grotesk", "Segoe UI", Arial, sans-serif;
     cursor: pointer;
     margin-bottom: 10px;
     transition: background-color 0.2s;
@@ -716,6 +816,7 @@ button[type="submit"]:hover {
     padding: 9px 20px;
     border-radius: 6px;
     font-size: 14px;
+    font-family: "Space Grotesk", "Segoe UI", Arial, sans-serif;
     cursor: pointer;
     margin-bottom: 10px;
     margin-left: 8px;
@@ -885,6 +986,16 @@ tbody tr:hover {
 
     table {
         font-size: 12px;
+    }
+
+    .address-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .toast-stack {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
     }
 }
 

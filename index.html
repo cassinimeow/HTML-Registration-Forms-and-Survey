@@ -142,20 +142,28 @@
                             <input type="text" id="addressSubdivision" name="address_subdivision" placeholder="e.g. Sunshine Village">
                         </div>
                         <div class="address-field">
-                            <label for="addressBarangay">Barangay</label>
-                            <input type="text" id="addressBarangay" name="address_barangay" placeholder="e.g. Barangay Uno">
-                        </div>
-                        <div class="address-field">
-                            <label for="addressCity">City / Municipality</label>
-                            <input type="text" id="addressCity" name="address_city" placeholder="e.g. Batac City">
+                            <label for="addressRegion">Region</label>
+                            <select id="addressRegion" name="address_region">
+                                <option value="">Select region</option>
+                            </select>
                         </div>
                         <div class="address-field">
                             <label for="addressProvince">Province</label>
-                            <input type="text" id="addressProvince" name="address_province" placeholder="e.g. Ilocos Norte">
+                            <select id="addressProvince" name="address_province">
+                                <option value="">Select province</option>
+                            </select>
                         </div>
                         <div class="address-field">
-                            <label for="addressRegion">Region</label>
-                            <input type="text" id="addressRegion" name="address_region" placeholder="e.g. Region I">
+                            <label for="addressCity">City / Municipality</label>
+                            <select id="addressCity" name="address_city">
+                                <option value="">Select city / municipality</option>
+                            </select>
+                        </div>
+                        <div class="address-field">
+                            <label for="addressBarangay">Barangay</label>
+                            <select id="addressBarangay" name="address_barangay">
+                                <option value="">Select barangay</option>
+                            </select>
                         </div>
                     </div>
 
@@ -380,20 +388,28 @@
                             <input type="text" id="d-address-subdivision" name="d_address_subdivision" placeholder="e.g. Sunshine Village">
                         </div>
                         <div class="address-field">
-                            <label for="d-address-barangay">Barangay</label>
-                            <input type="text" id="d-address-barangay" name="d_address_barangay" placeholder="e.g. Barangay Uno">
-                        </div>
-                        <div class="address-field">
-                            <label for="d-address-city">City / Municipality</label>
-                            <input type="text" id="d-address-city" name="d_address_city" placeholder="e.g. Batac City">
+                            <label for="d-address-region">Region</label>
+                            <select id="d-address-region" name="d_address_region">
+                                <option value="">Select region</option>
+                            </select>
                         </div>
                         <div class="address-field">
                             <label for="d-address-province">Province</label>
-                            <input type="text" id="d-address-province" name="d_address_province" placeholder="e.g. Ilocos Norte">
+                            <select id="d-address-province" name="d_address_province">
+                                <option value="">Select province</option>
+                            </select>
                         </div>
                         <div class="address-field">
-                            <label for="d-address-region">Region</label>
-                            <input type="text" id="d-address-region" name="d_address_region" placeholder="e.g. Region I">
+                            <label for="d-address-city">City / Municipality</label>
+                            <select id="d-address-city" name="d_address_city">
+                                <option value="">Select city / municipality</option>
+                            </select>
+                        </div>
+                        <div class="address-field">
+                            <label for="d-address-barangay">Barangay</label>
+                            <select id="d-address-barangay" name="d_address_barangay">
+                                <option value="">Select barangay</option>
+                            </select>
                         </div>
                     </div>
 
@@ -590,6 +606,8 @@
     <!-- AGUILA: External JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
+
+    <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
 
 </body>
 </html>
