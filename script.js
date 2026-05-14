@@ -326,6 +326,40 @@ function formatAddress(parts) {
     return cleaned.length ? cleaned.join(', ') : '—';
 }
 
+function deriveAddressFields(address, schema) {
+    var parts = getAddressParts(address);
+    var empty = {
+        street: '—',
+        subdivision: '—',
+        barangay: '—',
+        city: '—',
+        province: '—',
+        region: '—'
+    };
+    if (!parts.length) return empty;
+    if (schema === 'market' && parts.length >= 6) {
+        return {
+            street: parts[0] || '—',
+            subdivision: parts[1] || '—',
+            barangay: parts[2] || '—',
+            city: parts[3] || '—',
+            province: parts[4] || '—',
+            region: parts[5] || '—'
+        };
+    }
+    if (schema === 'disaster' && parts.length >= 6) {
+        return {
+            street: parts[0] || '—',
+            subdivision: parts[1] || '—',
+            region: parts[2] || '—',
+            province: parts[3] || '—',
+            city: parts[4] || '—',
+            barangay: parts[5] || '—'
+        };
+    }
+    return empty;
+}
+
 function getInputValue(id) {
     var el = document.getElementById(id);
     return el ? el.value : '';
@@ -334,14 +368,19 @@ function getInputValue(id) {
 function renderMarketRow(row) {
     var detailsBody = document.getElementById('market-details-body');
     var complianceBody = document.getElementById('market-compliance-body');
-    clearPlaceholderRow(detailsBody, 9);
+    var addressBody = document.getElementById('market-address-body');
+    clearPlaceholderRow(detailsBody, 8);
     clearPlaceholderRow(complianceBody, 5);
+    clearPlaceholderRow(addressBody, 7);
+
+    var addressFields = row.addressFields || deriveAddressFields(row.address, 'market');
 
     var detailsRow = document.createElement('tr');
     var complianceRow = document.createElement('tr');
+    var addressRow = document.createElement('tr');
     detailsRow.innerHTML =
-        '<td>' + row.fullname + '</td><td>' + row.address + '</td>' +
-        '<td>' + row.contact + '</td><td>' + row.businessName + '</td>' +
+        '<td>' + row.fullname + '</td><td>' + row.contact + '</td>' +
+        '<td>' + row.businessName + '</td>' +
         '<td>' + row.stall + '</td><td>' + row.goods + '</td>' +
         '<td>' + row.permit + '</td><td>' + row.idType + '</td>' +
         '<td>' + row.idNumber + '</td>';
@@ -349,32 +388,47 @@ function renderMarketRow(row) {
         '<td>' + row.fullname + '</td><td>' + row.sanitary + '</td>' +
         '<td>' + row.cleanliness + '</td><td>' + row.wasteSeg + '</td>' +
         '<td>' + row.healthCert + '</td>';
+    addressRow.innerHTML =
+        '<td>' + row.fullname + '</td><td>' + addressFields.street + '</td>' +
+        '<td>' + addressFields.subdivision + '</td><td>' + addressFields.barangay + '</td>' +
+        '<td>' + addressFields.city + '</td><td>' + addressFields.province + '</td>' +
+        '<td>' + addressFields.region + '</td>';
     if (row.sanitary === 'Poor' || row.wasteSeg === 'No') {
         complianceRow.classList.add('non-compliant');
     }
     detailsBody.appendChild(detailsRow);
     complianceBody.appendChild(complianceRow);
+    if (addressBody) addressBody.appendChild(addressRow);
 }
 
 function renderDisasterRow(row) {
     var householdBody = document.getElementById('disaster-household-body');
     var preparednessBody = document.getElementById('disaster-preparedness-body');
-    clearPlaceholderRow(householdBody, 3);
+    var addressBody = document.getElementById('disaster-address-body');
+    clearPlaceholderRow(householdBody, 2);
     clearPlaceholderRow(preparednessBody, 10);
+    clearPlaceholderRow(addressBody, 7);
+    var addressFields = row.addressFields || deriveAddressFields(row.address, 'disaster');
     var householdRow = document.createElement('tr');
     var preparednessRow = document.createElement('tr');
+    var addressRow = document.createElement('tr');
     householdRow.innerHTML =
-        '<td>' + row.familyName + '</td><td>' + row.address + '</td>' +
-        '<td>' + row.members + '</td>';
+        '<td>' + row.familyName + '</td><td>' + row.members + '</td>';
     preparednessRow.innerHTML =
         '<td>' + row.familyName + '</td><td>' + row.risk + '</td>' +
         '<td>' + row.pastDisaster + '</td><td>' + row.experience + '</td>' +
         '<td>' + row.evacPoint + '</td><td>' + row.evacPlan + '</td>' +
         '<td>' + row.planDetails + '</td><td>' + row.kit + '</td>' +
         '<td>' + row.kitItems + '</td><td>' + row.kitNeed + '</td>';
+    addressRow.innerHTML =
+        '<td>' + row.familyName + '</td><td>' + addressFields.street + '</td>' +
+        '<td>' + addressFields.subdivision + '</td><td>' + addressFields.barangay + '</td>' +
+        '<td>' + addressFields.city + '</td><td>' + addressFields.province + '</td>' +
+        '<td>' + addressFields.region + '</td>';
     if (row.kit === 'No') preparednessRow.classList.add('non-compliant');
     householdBody.appendChild(householdRow);
     preparednessBody.appendChild(preparednessRow);
+    if (addressBody) addressBody.appendChild(addressRow);
     renderMapRow(row);
 }
 
@@ -406,6 +460,7 @@ function renderMapRow(row) {
         barangay: row.barangay || '',
         city: row.city || ''
     };
+    var addressFields = row.addressFields || deriveAddressFields(row.address, 'disaster');
     if (!loc.barangay || !loc.city) {
         loc = getBarangayCityFromAddress(row.address);
     }
@@ -415,8 +470,54 @@ function renderMapRow(row) {
         '<td>' + row.familyName + '</td>' +
         '<td>' + loc.barangay + '</td>' +
         '<td>' + loc.city + '</td>' +
-        '<td><button class="map-zoom-btn" data-barangay="' + loc.barangay + '" data-city="' + loc.city + '" data-address="' + safeAddress + '">🔍 View</button></td>';
+        '<td><button class="map-zoom-btn" data-barangay="' + loc.barangay + '" data-city="' + loc.city + '" data-region="' + (addressFields.region || '') + '" data-address="' + safeAddress + '">🔍 View</button></td>';
     mapBody.appendChild(tr);
+    updateMapAnalytics();
+}
+
+function updateMapAnalytics() {
+    var mapBody = document.getElementById('map-table-body');
+    if (!mapBody) return;
+    var rows = Array.prototype.slice.call(mapBody.querySelectorAll('tr'));
+    var countsCity = {};
+    var countsRegion = {};
+    var total = 0;
+
+    rows.forEach(function(row) {
+        var btn = row.querySelector('.map-zoom-btn');
+        if (!btn) return;
+        var city = btn.getAttribute('data-city') || '—';
+        var region = btn.getAttribute('data-region') || '—';
+        total += 1;
+        countsCity[city] = (countsCity[city] || 0) + 1;
+        countsRegion[region] = (countsRegion[region] || 0) + 1;
+    });
+
+    function getTopLabel(counts) {
+        var topLabel = '—';
+        var topCount = 0;
+        Object.keys(counts).forEach(function(key) {
+            if (counts[key] > topCount && key !== '—') {
+                topLabel = key + ' (' + counts[key] + ')';
+                topCount = counts[key];
+            }
+        });
+        return topLabel;
+    }
+
+    var uniqueCities = Object.keys(countsCity).filter(function(key) { return key !== '—'; }).length;
+    var clicks = parseInt(localStorage.getItem('gisLookupClicks') || '0', 10);
+
+    var totalEl = document.getElementById('map-total');
+    var uniqueEl = document.getElementById('map-unique-cities');
+    var topCityEl = document.getElementById('map-top-city');
+    var topRegionEl = document.getElementById('map-top-region');
+    var clicksEl = document.getElementById('map-clicks');
+    if (totalEl) totalEl.textContent = total;
+    if (uniqueEl) uniqueEl.textContent = uniqueCities;
+    if (topCityEl) topCityEl.textContent = getTopLabel(countsCity);
+    if (topRegionEl) topRegionEl.textContent = getTopLabel(countsRegion);
+    if (clicksEl) clicksEl.textContent = clicks;
 }
 
 async function loadMarketRecords() {
@@ -432,6 +533,7 @@ async function loadMarketRecords() {
         renderMarketRow({
             fullname: item.fullname || '—',
             address: item.address || '—',
+            addressFields: deriveAddressFields(item.address || '—', 'market'),
             contact: item.contact || '—',
             businessName: item.business_name || '—',
             stall: item.stall || '—',
@@ -460,6 +562,7 @@ async function loadDisasterRecords() {
         renderDisasterRow({
             familyName: item.family_name || '—',
             address: item.address || '—',
+            addressFields: deriveAddressFields(item.address || '—', 'disaster'),
             members: item.members || '—',
             risk: item.risk || '—',
             pastDisaster: item.dexp || '—',
@@ -672,16 +775,107 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var idTypeInput = document.getElementById('idType');
     var idNumberInput = document.getElementById('idNumber');
+    function attachInputFilter(input, pattern) {
+        if (!input) return;
+        input.addEventListener('input', function() {
+            var cleaned = input.value.replace(pattern, '');
+            if (cleaned !== input.value) input.value = cleaned;
+        });
+    }
+    attachInputFilter(document.getElementById('fullname'), /[^A-Za-z .'-]/g);
+    attachInputFilter(document.getElementById('family-name'), /[^A-Za-z .'-]/g);
+    attachInputFilter(document.getElementById('contact'), /[^0-9+()\s-]/g);
+    attachInputFilter(document.getElementById('family-members'), /[^0-9]/g);
+    var idTypeConfig = {
+        'PhilSys (National ID)': { placeholder: '1234-5678-9012', pattern: '^\\d{4}-\\d{4}-\\d{4}$' },
+        'Philippine Passport': { placeholder: 'P1234567', pattern: '^[A-Z]{1}\\d{7,8}$' },
+        "Driver's License": { placeholder: 'A12-34-567890', pattern: '^[A-Z]\\d{2}-\\d{2}-\\d{6}$' },
+        'UMID': { placeholder: '0000-0000000-0', pattern: '^\\d{4}-\\d{7}-\\d{1}$' },
+        'SSS ID': { placeholder: '00-0000000-0', pattern: '^\\d{2}-\\d{7}-\\d{1}$' },
+        'GSIS ID': { placeholder: '00-0000000-0', pattern: '^\\d{2}-\\d{7}-\\d{1}$' },
+        'PRC ID': { placeholder: '1234567', pattern: '^\\d{6,8}$' },
+        'Postal ID': { placeholder: '0000-0000-0000', pattern: '^\\d{4}-\\d{4}-\\d{4}$' },
+        'PhilHealth ID': { placeholder: '00-000000000-0', pattern: '^\\d{2}-\\d{9}-\\d{1}$' },
+        'TIN ID': { placeholder: '000-000-000-000', pattern: '^\\d{3}-\\d{3}-\\d{3}-\\d{3}$' },
+        "Voter's ID": { placeholder: 'ABCD-1234-5678', pattern: '^[A-Z]{2,4}-\\d{4}-\\d{4}$' },
+        'Other': { placeholder: 'Enter ID number', pattern: '' }
+    };
+
+    function validateIdNumber() {
+        if (!idNumberInput) return;
+        var pattern = idNumberInput.dataset.pattern || '';
+        var value = idNumberInput.value.trim();
+        if (!pattern || !value) {
+            idNumberInput.removeAttribute('aria-invalid');
+            return;
+        }
+        var ok = new RegExp(pattern).test(value);
+        idNumberInput.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    }
+
     function syncIdNumberState() {
         if (!idTypeInput || !idNumberInput) return;
         var hasType = idTypeInput.value.trim().length > 0;
         idNumberInput.disabled = !hasType;
-        if (!hasType) idNumberInput.value = '';
+        idNumberInput.required = hasType;
+        if (!hasType) {
+            idNumberInput.value = '';
+            idNumberInput.placeholder = 'e.g. 1234-5678-9012';
+            idNumberInput.dataset.pattern = '';
+            idNumberInput.title = '';
+            idNumberInput.removeAttribute('aria-invalid');
+            return;
+        }
+        var config = idTypeConfig[idTypeInput.value] || { placeholder: 'Enter ID number', pattern: '' };
+        idNumberInput.placeholder = config.placeholder;
+        idNumberInput.dataset.pattern = config.pattern;
+        idNumberInput.title = config.pattern ? 'Suggested format: ' + config.placeholder : '';
+        validateIdNumber();
     }
     if (idTypeInput) {
         idTypeInput.addEventListener('input', syncIdNumberState);
     }
+    if (idNumberInput) {
+        idNumberInput.addEventListener('input', validateIdNumber);
+        idNumberInput.addEventListener('blur', validateIdNumber);
+    }
     syncIdNumberState();
+
+    var descriptionInput = document.getElementById('description');
+    var eplanInputs = document.querySelectorAll('input[name="eplan"]');
+    var planChecks = document.querySelectorAll('input[name="plan"]');
+    var kitReadyInputs = document.querySelectorAll('input[name="kit_ready"]');
+    var kitItemChecks = document.querySelectorAll('input[name="kit_items"]');
+    var cleanlinessChecks = document.querySelectorAll('input[name="cleanliness[]"]');
+
+    function setCheckboxGroupValidity(inputs, required, message) {
+        if (!inputs.length) return;
+        var anyChecked = Array.prototype.some.call(inputs, function(input) { return input.checked; });
+        var first = inputs[0];
+        first.required = !!required;
+        first.setCustomValidity(required && !anyChecked ? (message || 'Please select at least one.') : '');
+    }
+
+    function updateConditionalRequirements() {
+        var dexpYes = (document.querySelector('input[name="dexp"]:checked') || {}).value === 'Yes';
+        if (descriptionInput) descriptionInput.required = !!dexpYes;
+
+        var eplanYes = (document.querySelector('input[name="eplan"]:checked') || {}).value === 'Yes';
+        setCheckboxGroupValidity(planChecks, eplanYes, 'Select at least one plan.');
+
+        var kitYes = (document.querySelector('input[name="kit_ready"]:checked') || {}).value === 'Yes';
+        setCheckboxGroupValidity(kitItemChecks, kitYes, 'Select at least one kit item.');
+
+        setCheckboxGroupValidity(cleanlinessChecks, true, 'Select at least one cleanliness option.');
+    }
+
+    document.querySelectorAll('input[name="dexp"], input[name="eplan"], input[name="kit_ready"]').forEach(function(input) {
+        input.addEventListener('change', updateConditionalRequirements);
+    });
+    planChecks.forEach(function(input) { input.addEventListener('change', updateConditionalRequirements); });
+    kitItemChecks.forEach(function(input) { input.addEventListener('change', updateConditionalRequirements); });
+    cleanlinessChecks.forEach(function(input) { input.addEventListener('change', updateConditionalRequirements); });
+    updateConditionalRequirements();
 
     var marketTopBtn = document.getElementById('market-top-btn');
     var marketClearBtn = document.getElementById('market-clear-btn');
@@ -842,11 +1036,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         ].join('%2C');
                         iframe.src = 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + lat + '%2C' + lon;
                         if (hazardLink) hazardLink.href = 'https://hazardhunter.georisk.gov.ph/map#map=14/' + lat + '/' + lon;
+                        localStorage.setItem('gisLookupClicks', String(parseInt(localStorage.getItem('gisLookupClicks') || '0', 10) + 1));
+                        updateMapAnalytics();
                         showToast('Map focus: ' + [barangay, city].filter(Boolean).join(', '), 'info');
                     })
                     .catch(function() {
                         iframe.src = 'https://www.openstreetmap.org/export/embed.html?bbox=116.9%2C4.5%2C127.1%2C20.8&layer=mapnik';
                         if (hazardLink) hazardLink.href = 'https://hazardhunter.georisk.gov.ph/map';
+                        updateMapAnalytics();
                         showToast('Location not found. Open the map to search.', 'error');
                     });
             }
@@ -967,6 +1164,14 @@ document.getElementById('market-form').addEventListener('submit', async function
             getSelectText('addressProvince'),
             getSelectText('addressRegion')
         ]),
+        addressFields: {
+            street: getInputValue('addressStreet') || '—',
+            subdivision: getInputValue('addressSubdivision') || '—',
+            barangay: getSelectText('addressBarangay') || '—',
+            city: getSelectText('addressCity') || '—',
+            province: getSelectText('addressProvince') || '—',
+            region: getSelectText('addressRegion') || '—'
+        },
         contact:      document.getElementById('contact').value || '—',
         businessName: document.getElementById('businessName').value || '—',
         stall:        document.getElementById('stall').value || '—',
@@ -1052,6 +1257,14 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
             getSelectText('d-address-city'),
             getSelectText('d-address-barangay')
         ]),
+        addressFields: {
+            street: getInputValue('d-address-street') || '—',
+            subdivision: getInputValue('d-address-subdivision') || '—',
+            barangay: getSelectText('d-address-barangay') || '—',
+            city: getSelectText('d-address-city') || '—',
+            province: getSelectText('d-address-province') || '—',
+            region: getSelectText('d-address-region') || '—'
+        },
         city:       getSelectText('d-address-city') || '—',
         barangay:   getSelectText('d-address-barangay') || '—',
         members:    document.getElementById('family-members').value || '—',
@@ -1104,12 +1317,12 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
 
 /* --- Export to CSV (simulated Excel export) --- */
 function exportToCSV() {
-    var headers = ['Full Name','Address','Contact','Business Name','Stall No.','Goods Sold','Permit No.','ID Type','ID Number'];
+    var headers = ['Full Name','Contact','Business Name','Stall No.','Goods Sold','Permit No.','ID Type','ID Number'];
     var rows = [headers];
     var tbody = document.getElementById('market-details-body');
     for (var i = 0; i < tbody.rows.length; i++) {
         var cells = tbody.rows[i].cells;
-        if (cells[0].colSpan == 9) continue;
+        if (cells[0].colSpan == 8) continue;
         var row = [];
         for (var j = 0; j < cells.length; j++) row.push('"' + cells[j].innerText + '"');
         rows.push(row);

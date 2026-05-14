@@ -47,27 +47,27 @@
         <div class="dev-card">
             <div class="dev-photo" style="background-image: url('assets/dev_pfp/aguilander.jpg')" aria-hidden="true"></div>
             <div class="dev-name">Elizander Aguila</div>
-            <div class="dev-role">Styling, Functionality and Database</div>
+            <div class="dev-role">Project Manager, Styling, Functionality, and Database</div>
         </div>
         <div class="dev-card">
             <div class="dev-photo" style="background-image: url('assets/dev_pfp/abelarde.jpg')" aria-hidden="true"></div>
             <div class="dev-name">Christian Abelarde</div>
-            <div class="dev-role">Market form: Vendor details section</div>
+            <div class="dev-role">Market form: Vendor details section, Styling, and QA</div>
         </div>
         <div class="dev-card">
             <div class="dev-photo" style="background-image: url('assets/dev_pfp/dinaya.jpg')" aria-hidden="true"></div>
             <div class="dev-name">Johann Mcwee Dinaya</div>
-            <div class="dev-role">Disaster form: Household information section</div>
+            <div class="dev-role">Disaster form: Household information section, Styling, and QA</div>
         </div>
         <div class="dev-card">
             <div class="dev-photo" style="background-image: url('assets/dev_pfp/mayo.jpg')" aria-hidden="true"></div>
             <div class="dev-name">Xyra Mayo</div>
-            <div class="dev-role">Disaster form: Preparedness check section</div>
+            <div class="dev-role">Disaster form: Preparedness check section, Styling, and QA</div>
         </div>
         <div class="dev-card">
             <div class="dev-photo" style="background-image: url('assets/dev_pfp/juampit.jpg')" aria-hidden="true"></div>
             <div class="dev-name">Edrian Juampit</div>
-            <div class="dev-role">Market form: Compliance & sanitation section</div>
+            <div class="dev-role">Market form: Compliance & sanitation section, Styling, and QA</div>
         </div>
     </div>
 </section>
@@ -129,58 +129,58 @@
                     <legend>Personal Information</legend>
 
                     <label for="fullname">Full Name:</label>
-                    <input type="text" id="fullname" name="fullname" placeholder="e.g. Juan Dela Cruz">
+                    <input type="text" id="fullname" name="fullname" placeholder="e.g. Juan Dela Cruz" required pattern="^[A-Za-z .'-]{2,}$" autocomplete="name">
 
                     <label>Home Address:</label>
                     <div class="address-grid">
                         <div class="address-field">
                             <label for="addressStreet">Street Name</label>
-                            <input type="text" id="addressStreet" name="address_street" placeholder="e.g. 123 Rizal St.">
+                            <input type="text" id="addressStreet" name="address_street" placeholder="e.g. 123 Rizal St." required pattern="^[A-Za-z0-9 .,'-/#]{2,}$" autocomplete="address-line1">
                         </div>
                         <div class="address-field">
                             <label for="addressSubdivision">Subdivision (optional)</label>
-                            <input type="text" id="addressSubdivision" name="address_subdivision" placeholder="e.g. Sunshine Village">
+                            <input type="text" id="addressSubdivision" name="address_subdivision" placeholder="e.g. Sunshine Village" pattern="^[A-Za-z0-9 .,'-]{2,}$" autocomplete="address-line2">
                         </div>
                         <div class="address-field">
                             <label for="addressRegion">Region</label>
-                            <select id="addressRegion" name="address_region">
+                            <select id="addressRegion" name="address_region" required>
                                 <option value="">Select region</option>
                             </select>
                         </div>
                         <div class="address-field">
                             <label for="addressProvince">Province</label>
-                            <select id="addressProvince" name="address_province">
+                            <select id="addressProvince" name="address_province" required>
                                 <option value="">Select province</option>
                             </select>
                         </div>
                         <div class="address-field">
                             <label for="addressCity">City / Municipality</label>
-                            <select id="addressCity" name="address_city">
+                            <select id="addressCity" name="address_city" required>
                                 <option value="">Select city / municipality</option>
                             </select>
                         </div>
                         <div class="address-field">
                             <label for="addressBarangay">Barangay</label>
-                            <select id="addressBarangay" name="address_barangay">
+                            <select id="addressBarangay" name="address_barangay" required>
                                 <option value="">Select barangay</option>
                             </select>
                         </div>
                     </div>
 
                     <label for="contact">Contact Number:</label>
-                    <input type="text" id="contact" name="contact" placeholder="e.g. 09XXXXXXXXX">
+                    <input type="text" id="contact" name="contact" placeholder="e.g. 09XXXXXXXXX" required inputmode="tel" pattern="^[0-9+()\s-]{7,15}$" autocomplete="tel">
 
                     <label for="stall">Stall Number / Location:</label>
-                    <input type="text" id="stall" name="stall" placeholder="e.g. Stall 12, Section B">
+                    <input type="text" id="stall" name="stall" placeholder="e.g. Stall 12, Section B" required pattern="^[A-Za-z0-9 .,'-/#]{2,}$">
 
                     <label for="businessName">Business Name:</label>
-                    <input type="text" id="businessName" name="businessName" placeholder="e.g. Juan's Fresh Produce">
+                    <input type="text" id="businessName" name="businessName" placeholder="e.g. Juan's Fresh Produce" required pattern="^[A-Za-z0-9 .,'-]{2,}$">
 
                     <label for="goods">Type of Goods Sold:</label>
-                    <input type="text" id="goods" name="goods" placeholder="e.g. Vegetables, Fruits">
+                    <input type="text" id="goods" name="goods" placeholder="e.g. Vegetables, Fruits" required pattern="^[A-Za-z0-9 ,.'-]{2,}$">
 
                     <label for="permit">Business Permit Number:</label>
-                    <input type="text" id="permit" name="permit" placeholder="e.g. BP-2024-00123">
+                    <input type="text" id="permit" name="permit" placeholder="e.g. BP-2024-00123" required pattern="^[A-Za-z0-9-/.]{4,}$">
                 </fieldset>
 
                 <fieldset class="legend-id">
@@ -224,7 +224,7 @@
                     <legend>Compliance Check</legend>
 
                     <p>Sanitary Practices:</p>
-                    <input type="radio" id="good" name="sanitary" value="Good">
+                    <input type="radio" id="good" name="sanitary" value="Good" required>
                     <label for="good">Good</label><br>
                     <input type="radio" id="fair" name="sanitary" value="Fair">
                     <label for="fair">Fair</label><br>
@@ -238,14 +238,14 @@
                     <label for="waste">Waste Disposal</label><br><br>
 
                     <p>Waste Segregation Compliance:</p>
-                    <input type="radio" id="wsyes" name="wasteSegregation" value="Yes">
+                    <input type="radio" id="wsyes" name="wasteSegregation" value="Yes" required>
                     <label for="wsyes">Yes</label><br>
                     <input type="radio" id="wsno" name="wasteSegregation" value="No">
                     <label for="wsno">No</label><br><br>
 
                     <p>Health Certificate Status:</p>
                     <label for="healthStatus">Select Status:</label>
-                    <select id="healthStatus" name="healthStatus">
+                    <select id="healthStatus" name="healthStatus" required>
                         <option value="Valid">Valid</option>
                         <option value="Expired">Expired</option>
                         <option value="Not Yet Obtained">Not Yet Obtained</option>
@@ -254,7 +254,7 @@
 
                 <fieldset class="legend-agreement">
                     <legend>Agreement</legend>
-                    <input type="checkbox" id="agree" name="agree">
+                    <input type="checkbox" id="agree" name="agree" required>
                     <label for="agree">I hereby certify that the information provided is true and correct.</label>
                 </fieldset>
 
@@ -306,7 +306,6 @@
                         <thead>
                             <tr>
                                 <th>Full Name</th>
-                                <th>Address</th>
                                 <th>Contact</th>
                                 <th>Business Name</th>
                                 <th>Stall No.</th>
@@ -317,7 +316,27 @@
                             </tr>
                         </thead>
                         <tbody id="market-details-body">
-                            <tr><td colspan="9" style="text-align:center; color:#888;">No records yet.</td></tr>
+                            <tr><td colspan="8" style="text-align:center; color:#888;">No records yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 class="report-head"><span class="report-icon">📍</span>Vendor Address Report</h2>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Street</th>
+                                <th>Subdivision</th>
+                                <th>Barangay</th>
+                                <th>City / Municipality</th>
+                                <th>Province</th>
+                                <th>Region</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-address-body">
+                            <tr><td colspan="7" style="text-align:center; color:#888;">No records yet.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -375,46 +394,46 @@
                     <legend>Household Information</legend>
 
                     <label for="family-name">Family Name:</label>
-                    <input type="text" id="family-name" name="family_name" placeholder="e.g. Dela Cruz">
+                    <input type="text" id="family-name" name="family_name" placeholder="e.g. Dela Cruz" required pattern="^[A-Za-z .'-]{2,}$">
 
                     <label>Address:</label>
                     <div class="address-grid">
                         <div class="address-field">
                             <label for="d-address-street">Street Name</label>
-                            <input type="text" id="d-address-street" name="d_address_street" placeholder="e.g. 123 Rizal St.">
+                            <input type="text" id="d-address-street" name="d_address_street" placeholder="e.g. 123 Rizal St." required pattern="^[A-Za-z0-9 .,'-/#]{2,}$" autocomplete="address-line1">
                         </div>
                         <div class="address-field">
                             <label for="d-address-subdivision">Subdivision (optional)</label>
-                            <input type="text" id="d-address-subdivision" name="d_address_subdivision" placeholder="e.g. Sunshine Village">
+                            <input type="text" id="d-address-subdivision" name="d_address_subdivision" placeholder="e.g. Sunshine Village" pattern="^[A-Za-z0-9 .,'-]{2,}$" autocomplete="address-line2">
                         </div>
                         <div class="address-field">
                             <label for="d-address-region">Region</label>
-                            <select id="d-address-region" name="d_address_region">
+                            <select id="d-address-region" name="d_address_region" required>
                                 <option value="">Select region</option>
                             </select>
                         </div>
                         <div class="address-field">
                             <label for="d-address-province">Province</label>
-                            <select id="d-address-province" name="d_address_province">
+                            <select id="d-address-province" name="d_address_province" required>
                                 <option value="">Select province</option>
                             </select>
                         </div>
                         <div class="address-field">
                             <label for="d-address-city">City / Municipality</label>
-                            <select id="d-address-city" name="d_address_city">
+                            <select id="d-address-city" name="d_address_city" required>
                                 <option value="">Select city / municipality</option>
                             </select>
                         </div>
                         <div class="address-field">
                             <label for="d-address-barangay">Barangay</label>
-                            <select id="d-address-barangay" name="d_address_barangay">
+                            <select id="d-address-barangay" name="d_address_barangay" required>
                                 <option value="">Select barangay</option>
                             </select>
                         </div>
                     </div>
 
                     <label for="family-members">Number of Family Members:</label>
-                    <input type="number" id="family-members" name="family_members" min="1" placeholder="e.g. 5">
+                    <input type="number" id="family-members" name="family_members" min="1" placeholder="e.g. 5" required inputmode="numeric">
                 </fieldset>
 
             </div>
@@ -434,14 +453,14 @@
                     <legend>Preparedness Check</legend>
 
                     <label>1. How would you describe the level of flood/typhoon risk in your area?</label>
-                    <select name="risk" id="risk">
+                    <select name="risk" id="risk" required>
                         <option value="High">High</option>
                         <option value="Moderate">Moderate</option>
                         <option value="Low">Low</option>
                     </select>
 
                     <p>2. Has your household experienced any disasters in the past?</p>
-                    <input type="radio" name="dexp" id="dyes" value="Yes">
+                    <input type="radio" name="dexp" id="dyes" value="Yes" required>
                     <label for="dyes">Yes</label><br>
                     <input type="radio" name="dexp" id="dno" value="No">
                     <label for="dno">No</label><br><br>
@@ -450,13 +469,13 @@
                     <textarea name="description" id="description" rows="4" placeholder="e.g. Our house was flooded during Typhoon Ondoy in 2009..."></textarea>
 
                     <p>4. Does your household know where to go for evacuation during a flood or typhoon?</p>
-                    <input type="radio" name="epoint" id="epyes" value="Yes">
+                    <input type="radio" name="epoint" id="epyes" value="Yes" required>
                     <label for="epyes">Yes</label><br>
                     <input type="radio" name="epoint" id="epno" value="No">
                     <label for="epno">No</label><br><br>
 
                     <p>5. Does your household have an evacuation plan?</p>
-                    <input type="radio" name="eplan" id="eyes" value="Yes">
+                    <input type="radio" name="eplan" id="eyes" value="Yes" required>
                     <label for="eyes">Yes</label><br>
                     <input type="radio" name="eplan" id="eno" value="No">
                     <label for="eno">No</label><br><br>
@@ -472,7 +491,7 @@
                     <label for="plan4">Emergency contact list</label><br><br>
 
                     <p>7. Does your household have a disaster-ready emergency kit?</p>
-                    <input type="radio" name="kit_ready" id="kyes" value="Yes">
+                    <input type="radio" name="kit_ready" id="kyes" value="Yes" required>
                     <label for="kyes">Yes</label><br>
                     <input type="radio" name="kit_ready" id="kno" value="No">
                     <label for="kno">No</label><br><br>
@@ -496,7 +515,7 @@
                     <label for="kit8">Important documents</label><br><br>
 
                     <p>9. Does your household currently need an emergency kit?</p>
-                    <input type="radio" name="kit_need" id="ekityes" value="Yes">
+                    <input type="radio" name="kit_need" id="ekityes" value="Yes" required>
                     <label for="ekityes">Yes</label><br>
                     <input type="radio" name="kit_need" id="ekitno" value="No">
                     <label for="ekitno">No</label>
@@ -531,7 +550,7 @@
             </div>
             </div>
 
-            <div class="map-report">
+            <div class="map-report report-card">
                 <h2 class="report-head"><span class="report-icon">🔎</span>GIS Location Lookup</h2>
                 <div class="table-scroll">
                     <table>
@@ -547,6 +566,28 @@
                             <tr><td colspan="4" style="text-align:center; color:#888;">No records yet.</td></tr>
                         </tbody>
                     </table>
+                </div>
+                <div class="report-analytics" id="map-analytics">
+                    <div class="report-stat">
+                        <div class="stat-label">Mapped households</div>
+                        <div class="stat-value" id="map-total">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Unique cities</div>
+                        <div class="stat-value" id="map-unique-cities">0</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Top city</div>
+                        <div class="stat-value" id="map-top-city">—</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Top region</div>
+                        <div class="stat-value" id="map-top-region">—</div>
+                    </div>
+                    <div class="report-stat">
+                        <div class="stat-label">Lookup clicks</div>
+                        <div class="stat-value" id="map-clicks">0</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -584,12 +625,31 @@
                         <thead>
                             <tr>
                                 <th>Family Name</th>
-                                <th>Address</th>
                                 <th>Members</th>
                             </tr>
                         </thead>
                         <tbody id="disaster-household-body">
-                            <tr><td colspan="3" style="text-align:center; color:#888;">No records yet.</td></tr>
+                            <tr><td colspan="2" style="text-align:center; color:#888;">No records yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 class="report-head"><span class="report-icon">📍</span>Household Address Report</h2>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Family Name</th>
+                                <th>Street</th>
+                                <th>Subdivision</th>
+                                <th>Barangay</th>
+                                <th>City / Municipality</th>
+                                <th>Province</th>
+                                <th>Region</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disaster-address-body">
+                            <tr><td colspan="7" style="text-align:center; color:#888;">No records yet.</td></tr>
                         </tbody>
                     </table>
                 </div>
