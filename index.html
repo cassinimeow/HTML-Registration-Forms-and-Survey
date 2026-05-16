@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebDev Assessment #1</title>
+    <title>Philippine-Wide Vendor Registration & Disaster Preparedness Form</title>
     <link rel="icon" href="assets/ph-coat-of-arms.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap">
 
     <!-- AGUILA: External CSS -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
 
@@ -24,7 +25,7 @@
         <div class="hero-inner">
             <div class="hero-copy">
                 <div class="hero-meta">Philippines-wide Coverage</div>
-                <h1 id="hero-title">Market Vendor Registration Form</h1>
+                <h1 id="hero-title">Philippine-Wide Vendor Registration & Disaster Preparedness Form</h1>
                 <p id="hero-description">
                     Clean, centralized forms for vendor registration and household disaster readiness,
                     designed for fast reporting across the Philippines.
@@ -106,7 +107,7 @@
     <!-- ============================================================ -->
     <div id="market-page" class="page" style="display:none;">
 
-        <h1>Public Market Vendor Registration Form</h1>
+        <!-- page title removed (hero already provides page context) -->
         <div class="page-actions">
             <button type="button" class="form-action-btn" id="market-report-btn">Table Report</button>
             <button type="button" class="form-action-btn" id="market-form-btn">Back to Form</button>
@@ -125,13 +126,16 @@
                     </div>
                 </div>
 
+                <h3 class="icon-person">Personal Information</h3>
+
                 <fieldset class="legend-personal">
                     <legend>Personal Information</legend>
-
                     <label for="fullname">Full Name:</label>
                     <input type="text" id="fullname" name="fullname" placeholder="e.g. Juan Dela Cruz" required pattern="^[A-Za-z .'-]{2,}$" autocomplete="name">
 
-                    <label>Home Address:</label>
+                    <label for="contact">Contact Number:</label>
+                    <input type="text" id="contact" name="contact" placeholder="e.g. 09XXXXXXXXX" required inputmode="tel" pattern="^[0-9+()\s-]{7,15}$" autocomplete="tel">
+                    
                     <div class="address-grid">
                         <div class="address-field">
                             <label for="addressStreet">Street Name</label>
@@ -166,11 +170,12 @@
                             </select>
                         </div>
                     </div>
+                </fieldset>
 
-                    <label for="contact">Contact Number:</label>
-                    <input type="text" id="contact" name="contact" placeholder="e.g. 09XXXXXXXXX" required inputmode="tel" pattern="^[0-9+()\s-]{7,15}$" autocomplete="tel">
-
-                    <label for="stall">Stall Number / Location:</label>
+                <h3 class="icon-stall">Stall Details</h3>
+                <fieldset class="legend-vendordetails">
+                <legend>Vendor Details</legend>
+                <label for="stall">Stall Number / Location:</label>
                     <input type="text" id="stall" name="stall" placeholder="e.g. Stall 12, Section B" required pattern="^[A-Za-z0-9 .,'-/#]{2,}$">
 
                     <label for="businessName">Business Name:</label>
@@ -183,6 +188,7 @@
                     <input type="text" id="permit" name="permit" placeholder="e.g. BP-2024-00123" required pattern="^[A-Za-z0-9-/.]{4,}$">
                 </fieldset>
 
+                <h3 class="icon-id">Identification</h3>
                 <fieldset class="legend-id">
                     <legend>Identification</legend>
 
@@ -296,11 +302,16 @@
                         <div class="stat-value" id="market-health-valid">0</div>
                     </div>
                     <div class="report-actions">
-                        <button id="export-btn" onclick="exportToCSV()">⬇️ Export to Excel (CSV)</button>
+                        <button id="export-all-btn" onclick="exportToCSV('all')">⬇️ Export All CSV</button>
                     </div>
                 </div>
 
-                <h2 class="report-head"><span class="report-icon">🏪</span>Vendor Details Report</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+                    <h2 class="report-head"><span class="report-icon">🏪</span>Vendor Details Report</h2>
+                    <div>
+                        <button class="table-export-btn" onclick="exportToCSV('market-details-body')"><span class="icon">📤</span> Export this table</button>
+                    </div>
+                </div>
                 <div class="table-scroll">
                     <table>
                         <thead>
@@ -321,7 +332,12 @@
                     </table>
                 </div>
 
-                <h2 class="report-head"><span class="report-icon">📍</span>Vendor Address Report</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+                    <h2 class="report-head"><span class="report-icon">📍</span>Vendor Address Report</h2>
+                    <div>
+                        <button class="table-export-btn" onclick="exportToCSV('market-address-body')"><span class="icon">📤</span> Export this table</button>
+                    </div>
+                </div>
                 <div class="table-scroll">
                     <table>
                         <thead>
@@ -341,7 +357,12 @@
                     </table>
                 </div>
 
-                <h2 class="report-head"><span class="report-icon">✅</span>Compliance Check Report</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+                    <h2 class="report-head"><span class="report-icon">✅</span>Compliance Check Report</h2>
+                    <div>
+                        <button class="table-export-btn" onclick="exportToCSV('market-compliance-body')"><span class="icon">📤</span> Export this table</button>
+                    </div>
+                </div>
                 <div class="table-scroll">
                     <table>
                         <thead>
@@ -370,7 +391,7 @@
     <!-- ============================================================ -->
     <div id="disaster-page" class="page" style="display:none;">
 
-        <h1>Disaster Preparedness Survey</h1>
+        <!-- page title removed (hero already provides page context) -->
         <div class="page-actions">
             <button type="button" class="form-action-btn" id="disaster-report-btn">Table Report</button>
             <button type="button" class="form-action-btn" id="disaster-map-btn">GIS Map Layer</button>
@@ -389,14 +410,14 @@
                         <div class="section-subtitle">Basic household details</div>
                     </div>
                 </div>
-
+                
+                <h3 class="icon-family">Family Information</h3>
                 <fieldset class="legend-household">
                     <legend>Household Information</legend>
-
+                    
                     <label for="family-name">Family Name:</label>
                     <input type="text" id="family-name" name="family_name" placeholder="e.g. Dela Cruz" required pattern="^[A-Za-z .'-]{2,}$">
 
-                    <label>Address:</label>
                     <div class="address-grid">
                         <div class="address-field">
                             <label for="d-address-street">Street Name</label>
@@ -616,10 +637,17 @@
                         <div class="stat-label">Emergency kit: yes</div>
                         <div class="stat-value" id="disaster-kit-yes">0</div>
                     </div>
+                    <div class="report-actions">
+                        <button id="export-all-disaster-analytics" onclick="exportToCSV('all')" class="table-export-btn"><span class="icon">⬇️</span> Export All CSV</button>
+                    </div>
                 </div>
 
-                <h2 class="report-head"><span class="report-icon">🏠</span>Household Information Report</h2>
-                <button id="print-btn" onclick="window.print()">🖨️ Print Report</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                    <h2 class="report-head"><span class="report-icon">🏠</span>Household Information Report</h2>
+                    <div>
+                        <button class="table-export-btn" onclick="exportToCSV('disaster-household-body')"><span class="icon">📤</span> Export this table</button>
+                    </div>
+                </div>
                 <div class="table-scroll">
                     <table>
                         <thead>
@@ -634,7 +662,12 @@
                     </table>
                 </div>
 
-                <h2 class="report-head"><span class="report-icon">📍</span>Household Address Report</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+                    <h2 class="report-head"><span class="report-icon">📍</span>Household Address Report</h2>
+                    <div>
+                        <button class="table-export-btn" onclick="exportToCSV('disaster-address-body')"><span class="icon">📤</span> Export this table</button>
+                    </div>
+                </div>
                 <div class="table-scroll">
                     <table>
                         <thead>
@@ -654,7 +687,12 @@
                     </table>
                 </div>
 
-                <h2 class="report-head"><span class="report-icon">🧭</span>Preparedness Check Report</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+                    <h2 class="report-head"><span class="report-icon">🧭</span>Preparedness Check Report</h2>
+                    <div>
+                        <button class="table-export-btn" onclick="exportToCSV('disaster-preparedness-body')"><span class="icon">📤</span> Export this table</button>
+                    </div>
+                </div>
                 <div class="table-scroll">
                     <table>
                         <thead>

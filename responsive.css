@@ -1,0 +1,179 @@
+/* ============================================================ */
+/*                  RESPONSIVE STYLES (extracted)              */
+/* ============================================================ */
+
+@media (max-width: 1100px) {
+    .dev-team-grid {
+        flex-wrap: wrap;
+    }
+
+    .dev-card {
+        min-width: 180px;
+        max-width: 220px;
+    }
+}
+
+@media (max-width: 640px) {
+    .dev-card {
+        min-width: 220px;
+        max-width: 260px;
+    }
+    .hero {
+        min-height: 72vh;
+    }
+
+    .hero-inner {
+        margin-top: -20px;
+    }
+
+    .dev-team {
+        margin: 6px auto 18px;
+    }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+    .page {
+        max-width: 100%;
+        margin: 24px auto;
+    }
+
+    .hero-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .hero-actions {
+        width: 100%;
+        align-items: center;
+    }
+
+    .hero-panel {
+        justify-items: center;
+    }
+
+    .hero-panel {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .page {
+        padding: 0 12px 40px;
+    }
+
+    .hero-inner {
+        padding: 20px 18px;
+    }
+
+    .hero-inner h1 {
+        font-size: 22px;
+    }
+
+    .hero-seal {
+        width: 140px;
+        height: 140px;
+    }
+
+    .page h1 {
+        font-size: 22px;
+    }
+
+    .page h2 {
+        font-size: 18px;
+    }
+
+    #abelarde-section,
+    #juampit-section,
+    #dinaya-section,
+    #mayo-section {
+        padding: 16px 18px;
+    }
+
+    fieldset {
+        padding: 14px 16px;
+    }
+
+    button[type="submit"],
+    #export-btn,
+    #print-btn {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    #map-placeholder iframe {
+        height: 260px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    .address-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .toast-stack {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page {
+        margin: 18px auto;
+    }
+
+    button[type="submit"] {
+        padding: 10px 14px;
+    }
+
+    #map-placeholder iframe {
+        height: 230px;
+    }
+}
+
+@media (max-width: 375px) {
+    .hero-inner h1 {
+        font-size: 20px;
+    }
+
+    .hero-inner p {
+        font-size: 14px;
+    }
+
+    .page h1 {
+        font-size: 20px;
+    }
+
+    .page h2 {
+        font-size: 17px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 320px) {
+    #map-placeholder iframe {
+        height: 200px;
+    }
+}
+
+/* === PRINT STYLES === */
+@media print {
+    #export-btn, #export-all-btn, .table-export-btn, #print-btn, button[type="submit"] { display: none; }
+    .bg { display: none; }
+    .page { margin: 0; padding: 0; max-width: 100%; }
+    #abelarde-section, #juampit-section,
+    #dinaya-section, #mayo-section {
+        background: white;
+        box-shadow: none;
+    }
+    .page h1, .page h2 { color: black; text-shadow: none; }
+}

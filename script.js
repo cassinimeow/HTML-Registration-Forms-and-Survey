@@ -163,6 +163,16 @@ function initAddressSelectors(config) {
     var barangaySelect = document.getElementById(config.barangayId);
     var regionSelect = document.getElementById(config.regionId);
 
+    function setEnabled(selectEl, enabled) {
+        if (!selectEl) return;
+        selectEl.disabled = !enabled;
+        if (!enabled) {
+            selectEl.classList.add('select-disabled');
+        } else {
+            selectEl.classList.remove('select-disabled');
+        }
+    }
+
     function resetCityBarangay() {
         setSelectOptions(citySelect, [], 'Select city');
         setSelectOptions(barangaySelect, [], 'Select barangay');
@@ -174,6 +184,10 @@ function initAddressSelectors(config) {
 
     fetchRegions().then(function(list) {
         setSelectOptions(regionSelect, list, 'Select region');
+        // initial enabled/disabled state
+        setEnabled(provinceSelect, !!(regionSelect && regionSelect.value));
+        setEnabled(citySelect, !!(provinceSelect && provinceSelect.value));
+        setEnabled(barangaySelect, !!(citySelect && citySelect.value));
     });
 
     if (regionSelect) {
@@ -181,14 +195,22 @@ function initAddressSelectors(config) {
             var code = regionSelect.value;
             resetCityBarangay();
             setSelectOptions(provinceSelect, [], 'Select province');
-            if (!code) return;
+            setEnabled(citySelect, false);
+            setEnabled(barangaySelect, false);
+            if (!code) {
+                setEnabled(provinceSelect, false);
+                return;
+            }
+            setEnabled(provinceSelect, true);
             var regionName = psgcCache.regionNameByCode[code] || '';
             var isNcr = regionName.toLowerCase().indexOf('national capital region') !== -1 || code === '130000000';
             if (isNcr) {
                 setSelectOptions(provinceSelect, [{ value: code, label: 'Metro Manila' }], 'Select province');
                 provinceSelect.value = code;
+                setEnabled(provinceSelect, true);
                 fetchCities(code).then(function(list) {
                     setSelectOptions(citySelect, list, 'Select city');
+                    setEnabled(citySelect, true);
                 });
                 return;
             }
@@ -203,7 +225,12 @@ function initAddressSelectors(config) {
             var code = provinceSelect.value;
             setSelectOptions(citySelect, [], 'Select city');
             setSelectOptions(barangaySelect, [], 'Select barangay');
-            if (!code) return;
+            setEnabled(barangaySelect, false);
+            if (!code) {
+                setEnabled(citySelect, false);
+                return;
+            }
+            setEnabled(citySelect, true);
             fetchCities(code).then(function(list) {
                 setSelectOptions(citySelect, list, 'Select city');
             });
@@ -214,7 +241,11 @@ function initAddressSelectors(config) {
         citySelect.addEventListener('change', function() {
             var code = citySelect.value;
             setSelectOptions(barangaySelect, [], 'Select barangay');
-            if (!code) return;
+            if (!code) {
+                setEnabled(barangaySelect, false);
+                return;
+            }
+            setEnabled(barangaySelect, true);
             fetchBarangays(code).then(function(list) {
                 setSelectOptions(barangaySelect, list, 'Select barangay');
             });
@@ -741,7 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var heroTitle = document.getElementById('hero-title');
     var heroDescription = document.getElementById('hero-description');
     if (heroTitle && heroDescription) {
-        heroTitle.textContent = 'Philippines-Wide Registration & Preparedness';
+        heroTitle.textContent = 'Philippine-Wide Vendor Registration & Disaster Preparedness Form';
         heroDescription.textContent = 'Select a form to begin capturing vendor records or disaster readiness data across the country.';
     }
     var heroMarketBtn = document.getElementById('hero-market-btn');
@@ -1098,7 +1129,7 @@ function showPage(page) {
             }
             document.body.classList.add('theme-disaster');
         } else if (page === 'home') {
-            heroTitle.textContent = 'Philippines-Wide Registration & Preparedness';
+            heroTitle.textContent = 'Philippine-Wide Vendor Registration & Disaster Preparedness Form';
             heroDescription.textContent = 'Select a form to begin capturing vendor records or disaster readiness data across the country.';
             if (heroMarketBtn) heroMarketBtn.classList.remove('is-active');
             if (heroDisasterBtn) heroDisasterBtn.classList.remove('is-active');
@@ -1315,21 +1346,125 @@ document.getElementById('disaster-form').addEventListener('submit', async functi
     showToast('Survey record saved.', 'success');
 });
 
-/* --- Export to CSV (simulated Excel export) --- */
-function exportToCSV() {
-    var headers = ['Full Name','Contact','Business Name','Stall No.','Goods Sold','Permit No.','ID Type','ID Number'];
-    var rows = [headers];
-    var tbody = document.getElementById('market-details-body');
-    for (var i = 0; i < tbody.rows.length; i++) {
-        var cells = tbody.rows[i].cells;
-        if (cells[0].colSpan == 8) continue;
-        var row = [];
-        for (var j = 0; j < cells.length; j++) row.push('"' + cells[j].innerText + '"');
-        rows.push(row);
+/* --- Export to CSV (single table or all tables) --- */
+function escapeCell(text) {
+    if (text === null || text === undefined) return '';
+    var s = String(text).replace(/"/g, '""');
+    return '"' + s + '"';
+}
+
+function csvFromTbody(tbodyId) {
+    var tbody = document.getElementById(tbodyId);
+    if (!tbody) return null;
+    var table = tbody.closest('table');
+    var headers = [];
+    if (table) {
+        var ths = table.querySelectorAll('thead th');
+        ths.forEach(function(th) { headers.push(th.innerText.trim()); });
     }
-    var csv = rows.map(function(r) { return r.join(','); }).join('\n');
+    var rows = [];
+    if (headers.length) rows.push(headers.map(escapeCell).join(','));
+    for (var i = 0; i < tbody.rows.length; i++) {
+        var tr = tbody.rows[i];
+        var cells = tr.cells;
+        if (cells.length === 1 && cells[0].colSpan > 1) {
+            // likely placeholder 'No records yet.' skip
+            continue;
+        }
+        var row = [];
+        for (var j = 0; j < cells.length; j++) {
+            row.push(escapeCell(cells[j].innerText.trim()));
+        }
+        rows.push(row.join(','));
+    }
+    return rows.join('\n');
+}
+
+function downloadBlob(text, filename) {
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    a.download = 'vendor_records.csv';
+    var blobUrl = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+    a.href = blobUrl;
+    a.download = filename;
+    // Append to DOM to ensure click works in some browsers
+    document.body.appendChild(a);
     a.click();
+    // cleanup
+    setTimeout(function() {
+        URL.revokeObjectURL(blobUrl);
+        a.remove();
+    }, 1000);
+}
+
+function timestampForFilename() {
+    var d = new Date();
+    function pad(n){return n<10? '0'+n : String(n);} 
+    var y = d.getFullYear();
+    var m = pad(d.getMonth()+1);
+    var day = pad(d.getDate());
+    var hh = pad(d.getHours());
+    var mm = pad(d.getMinutes());
+    return y + m + day + '_' + hh + mm;
+}
+
+function exportToCSV(target) {
+    // target: tbody id or 'all'
+    var mapping = [
+        { id: 'market-details-body', name: 'vendor_details' },
+        { id: 'market-address-body', name: 'vendor_address' },
+        { id: 'market-compliance-body', name: 'vendor_compliance' },
+        { id: 'disaster-household-body', name: 'household_info' },
+        { id: 'disaster-address-body', name: 'household_address' },
+        { id: 'disaster-preparedness-body', name: 'household_preparedness' },
+        { id: 'map-table-body', name: 'gis_lookup' }
+    ];
+
+    if (!target || target === 'all') {
+        // determine which page is visible and only export relevant tables
+        function activePage() {
+            var marketPage = document.getElementById('market-page');
+            var disasterPage = document.getElementById('disaster-page');
+            try {
+                if (marketPage && window.getComputedStyle(marketPage).display !== 'none') return 'market';
+                if (disasterPage && window.getComputedStyle(disasterPage).display !== 'none') return 'disaster';
+            } catch (e) {}
+            return null;
+        }
+
+        var page = activePage();
+        var parts = [];
+        var filtered = mapping.filter(function(m) {
+            if (!page) return true; // fallback: include all
+            if (page === 'market') return m.id && m.id.indexOf('market-') === 0;
+            if (page === 'disaster') return m.id && m.id.indexOf('disaster-') === 0;
+            return false;
+        });
+
+        filtered.forEach(function(m) {
+            var csv = csvFromTbody(m.id);
+            if (!csv) return;
+            parts.push('"' + (m.name || m.id) + '"');
+            parts.push(csv);
+            parts.push('');
+        });
+
+        if (!parts.length) {
+            showToast('No data available to export for this page.', 'info');
+            return;
+        }
+        var ts = timestampForFilename();
+        var filename = (page ? page + '_reports_' : 'all_reports_') + ts + '.csv';
+        downloadBlob(parts.join('\n'), filename);
+        showToast('Exported ' + (page || 'all') + ' tables to CSV.', 'success');
+        return;
+    }
+
+    var csv = csvFromTbody(target);
+    if (!csv) {
+        showToast('No data in selected table.', 'info');
+        return;
+    }
+    var name = target.replace(/[^a-z0-9_-]/gi, '_');
+    var ts = timestampForFilename();
+    downloadBlob(csv, name + '_' + ts + '.csv');
+    showToast('Exported ' + target + ' to CSV.', 'success');
 }
